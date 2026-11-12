@@ -509,7 +509,12 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "admin_usage_stats":
+            "admin_squads":
+{ Args: { "p_today": string }; Returns: {
+              "color": string,"created_at": string,"group_id": string,"icon": string,"member_count": number,"members": Json,"name": string,"workouts_7d": number
+            }[]
+                           },
+"admin_usage_stats":
 { Args: { "p_today": string }; Returns: Json
                            },
 "can_invite":

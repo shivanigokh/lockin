@@ -393,6 +393,7 @@ describe("owner-only usage dashboard", () => {
     const r2 = await anon.rpc("admin_usage_stats", { p_today: today });
     expect(r2.error).not.toBeNull();
     expect((await A.c.from("app_admins").select("*")).data ?? []).toEqual([]);
+    expect((await A.c.rpc("admin_squads", { p_today: today })).error).not.toBeNull();
   });
 
   it("the owner email gets aggregate counts only", async () => {
@@ -411,5 +412,11 @@ describe("owner-only usage dashboard", () => {
     expect((stats.daily as unknown[]).length).toBe(30);
     const blob = JSON.stringify(stats);
     for (const s of ["181.5", "88.8", "97.7", "knees", "weight", "height", "@lockin.test", "alice_"]) expect(blob, s).not.toContain(s);
+
+    const squads = ok(await c.rpc("admin_squads", { p_today: today })) as { name: string; members: { username: string }[] }[];
+    const swim = squads.find((g) => g.name === `Swim Squad ${run}`)!;
+    expect(swim.members.map((m) => m.username)).toContain(B.username);
+    const squadBlob = JSON.stringify(squads);
+    for (const s of ["181.5", "88.8", "knees", "weight", "@lockin.test", "Secret plan", "couch creature no more"]) expect(squadBlob, s).not.toContain(s);
   });
 });

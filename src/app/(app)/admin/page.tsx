@@ -7,7 +7,11 @@ import { Page, PageHeader } from "@/components/page-header";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TypeChart, UsageChart } from "@/components/charts/usage-chart";
-import { activity } from "@/lib/constants";
+import { activity, MIN_MEMBERS } from "@/lib/constants";
+import { SquadBadge } from "@/components/shell/squad-switcher";
+import { Avatar } from "@/components/ui/avatar";
+import { displayName } from "@/lib/utils";
+import { relTime } from "@/lib/dates";
 
 export const metadata: Metadata = { title: "Usage", robots: { index: false } };
 
@@ -20,7 +24,10 @@ export default async function AdminPage() {
   const me = await getMe();
   const supabase = await createClient();
   // The database decides: admin_usage_stats() raises for anyone not on the owner list.
-  const { data, error } = await supabase.rpc("admin_usage_stats", { p_today: me.today });
+  const [{ data, error }, { data: squads }] = await Promise.all([
+    supabase.rpc("admin_usage_stats", { p_today: me.today }),
+    supabase.rpc("admin_squads", { p_today: me.today }),
+  ]);
   if (error || !data) notFound();
   const s = data as unknown as Stats;
 
@@ -43,7 +50,7 @@ export default async function AdminPage() {
 
   return (
     <Page>
-      <PageHeader label="// owner only" title="Usage" sub="How many people are locking in. Counts only: no names, emails, health data or messages.">
+      <PageHeader label="// owner only" title="Usage" sub="How many people are locking in, and which squads exist. No emails, health data, goals or messages.">
         <Badge color="var(--color-lime)">
           <ShieldCheck className="h-3 w-3" /> admin
         </Badge>
@@ -72,6 +79,42 @@ export default async function AdminPage() {
           <TypeChart data={types} />
         </Card>
       </div>
+
+      <h2 className="display mb-4 mt-10 text-3xl">Squads ({squads?.length ?? 0})</h2>
+      {squads?.length ? (
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {squads.map((g) => {
+            const members = (g.members as { username: string; display_name: string | null; avatar_url: string | null; role: string; joined_at: string }[]) ?? [];
+            return (
+              <Card key={g.group_id}>
+                <div className="mb-3 flex items-center gap-3">
+                  <SquadBadge g={{ icon: g.icon, color: g.color }} size={40} />
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate font-bold">{g.name}</div>
+                    <div className="label-mono text-[10px]">
+                      {g.member_count}/10 · {g.member_count < MIN_MEMBERS ? "filling" : "active"} · created {relTime(g.created_at)}
+                    </div>
+                  </div>
+                  <Badge color="var(--color-lavender)">{g.workouts_7d} workouts/wk</Badge>
+                </div>
+                <ul className="space-y-1.5">
+                  {members.map((m) => (
+                    <li key={m.username} className="flex items-center gap-2.5 text-sm">
+                      <Avatar name={displayName(m)} src={m.avatar_url} seed={m.username} size={24} />
+                      <span className="min-w-0 flex-1 truncate">
+                        <span className="font-semibold">{displayName(m)}</span> <span className="text-muted">@{m.username}</span>
+                      </span>
+                      {m.role === "admin" ? <Badge color="var(--color-lime)">admin</Badge> : null}
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            );
+          })}
+        </div>
+      ) : (
+        <p className="text-sm text-muted">No squads yet.</p>
+      )}
     </Page>
   );
 }
