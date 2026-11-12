@@ -12,7 +12,12 @@ const compat = new FlatCompat({
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
+    // "// label" text is part of the visual language, not a stray comment
+    rules: { "react/jsx-no-comment-textnodes": "off" },
+  },
+  {
     ignores: [
+      "src/lib/database.types.ts",
       "node_modules/**",
       ".next/**",
       "out/**",
