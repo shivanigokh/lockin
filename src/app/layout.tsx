@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/toast";
 
-const display = Archivo({ subsets: ["latin"], weight: ["800", "900"], variable: "--font-display-face" });
-const body = Space_Grotesk({ subsets: ["latin"], variable: "--font-body" });
-const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-mono-face" });
+// Fonts are bundled with the app (OFL-licensed, from Fontsource) so builds never depend on Google Fonts being reachable.
+const display = localFont({ src: "./fonts/archivo.woff2", weight: "100 900", variable: "--font-display-face" });
+const body = localFont({ src: "./fonts/space-grotesk.woff2", weight: "300 700", variable: "--font-body" });
+const mono = localFont({ src: "./fonts/jetbrains-mono.woff2", weight: "100 800", variable: "--font-mono-face" });
 
 export const metadata: Metadata = {
   title: { default: "LOCK IN", template: "%s · LOCK IN" },
