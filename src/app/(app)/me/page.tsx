@@ -7,7 +7,7 @@ import { Page, PageHeader } from "@/components/page-header";
 import { Card, CardHeader } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { GoalBars, HabitTrendChart, MeasurementChart, WeeklyWorkoutsChart, WeightChart } from "@/components/charts/health-charts";
+import { HabitTrendChart, MeasurementChart, WeeklyWorkoutsChart, WeightChart } from "@/components/charts/health-charts";
 import { HealthProfileForm, MeasurementForm, MeasurementTable, NotesPanel, WeightForm, WeightList } from "@/components/health/health-forms";
 import { ACTIVITIES } from "@/lib/constants";
 import { cmTo, kgTo, round1, type LengthUnit, type WeightUnit } from "@/lib/units";
@@ -74,7 +74,7 @@ export default async function MyHealthPage() {
   const habitTrend = daysBetween(thirtyAgo, today).map((d) => ({ date: d, pct: habitTotal ? Math.round(((perDay.get(d) ?? 0) / habitTotal) * 100) : 0 }));
   const habitAvg = habitTrend.length ? Math.round(habitTrend.reduce((s, x) => s + x.pct, 0) / habitTrend.length) : 0;
 
-  const goalData = (goals.data ?? []).filter((g) => !g.archived).map((g) => ({ name: g.title.length > 18 ? g.title.slice(0, 17) + "…" : g.title, pct: g.pct }));
+  const goalData = (goals.data ?? []).filter((g) => !g.archived).map((g) => ({ name: g.title, pct: g.pct }));
 
   const ms = (measurements.data ?? []) as unknown as ({ id: string; measured_on: string } & Record<string, number | string | null>)[];
   const msChart = [...ms].reverse().map((m) => ({
@@ -93,14 +93,14 @@ export default async function MyHealthPage() {
         </Badge>
       </PageHeader>
 
-      <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="mb-4 grid grid-cols-2 gap-2 sm:mb-5 sm:gap-3 lg:grid-cols-4">
         <BigStat label="current" value={current != null ? `${fmtNum(round1(kgTo(current, wu)))}` : "–"} unit={wu} color="var(--color-lime)" />
         <BigStat label="change since start" value={change != null ? `${change > 0 ? "+" : ""}${fmtNum(round1(kgTo(change, wu)))}` : "–"} unit={wu} color="var(--color-lavender)" />
         <BigStat label="target" value={target != null ? fmtNum(round1(kgTo(target, wu))) : "–"} unit={wu} color="var(--color-pink)" />
         <BigStat label="height" value={profile.height_cm != null ? fmtNum(round1(cmTo(Number(profile.height_cm), lu))) : "–"} unit={lu} color="var(--color-cyan)" />
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-[1.5fr_1fr]">
+      <div className="grid gap-4 sm:gap-5 lg:grid-cols-[1.5fr_1fr]">
         <Card>
           <CardHeader label="weight history" title="The trend, not the day" />
           {toTarget != null ? (
@@ -113,7 +113,7 @@ export default async function MyHealthPage() {
             </div>
           ) : null}
           <WeightChart data={[...w].reverse().map((x) => ({ date: x.entry_date, value: round1(kgTo(x.weight_kg, wu)) }))} target={target != null ? round1(kgTo(target, wu)) : null} unit={wu} />
-          <div className="mt-5 border-t border-line pt-5">
+          <div className="mt-4 border-t border-line/60 pt-4 sm:mt-5 sm:pt-5">
             <WeightForm today={today} wu={wu} />
           </div>
         </Card>
@@ -123,8 +123,8 @@ export default async function MyHealthPage() {
         </Card>
       </div>
 
-      <h2 className="display mb-4 mt-10 text-3xl">Progress</h2>
-      <div className="grid gap-5 lg:grid-cols-2">
+      <h2 className="display mb-3 mt-8 text-2xl sm:mb-4 sm:mt-10 sm:text-3xl">Progress</h2>
+      <div className="grid gap-4 sm:gap-5 lg:grid-cols-2">
         <Card>
           <CardHeader label="workout consistency · 12 weeks" title={`${activeWeeks}/12 active weeks`} action={<Badge color="var(--color-lime)">streak {currentStreak}d</Badge>} />
           <WeeklyWorkoutsChart data={weeks} />
@@ -139,14 +139,14 @@ export default async function MyHealthPage() {
             <ul className="space-y-2.5">
               {byType.map((a) => (
                 <li key={a.value} className="flex items-center gap-3">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-lg text-black" style={{ background: a.color }}>
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-black" style={{ background: a.color }}>
                     <a.icon className="h-4 w-4" />
                   </span>
-                  <span className="flex-1 text-sm font-semibold">{a.label}</span>
+                  <span className="wrap-text flex-1 text-sm font-semibold">{a.label}</span>
                   <span className="whitespace-nowrap font-mono text-xs text-muted">
                     {a.n}× {a.km ? `· ${fmtNum(a.km, 1)} km` : ""}
                   </span>
-                  <ProgressBar value={(a.n / Math.max(...byType.map((b) => b.n))) * 100} size="sm" color={a.color} className="w-24" />
+                  <ProgressBar value={(a.n / Math.max(...byType.map((b) => b.n))) * 100} size="sm" color={a.color} className="w-14 shrink-0 sm:w-24" />
                 </li>
               ))}
             </ul>
@@ -156,12 +156,26 @@ export default async function MyHealthPage() {
         </Card>
         <Card>
           <CardHeader label="goal completion" title={goalData.length ? `${goalData.filter((g) => g.pct >= 100).length}/${goalData.length} done` : "No goals yet"} />
-          {goalData.length ? <GoalBars data={goalData} /> : <p className="text-sm text-muted">Set some in My goals.</p>}
+          {goalData.length ? (
+            <ul className="space-y-3">
+              {goalData.map((g, i) => (
+                <li key={i}>
+                  <div className="mb-1 flex items-baseline justify-between gap-3 text-sm">
+                    <span className="wrap-text font-semibold">{g.name}</span>
+                    <span className="shrink-0 font-mono text-xs text-pink">{Math.round(g.pct)}%</span>
+                  </div>
+                  <ProgressBar value={g.pct} size="sm" color={g.pct >= 100 ? "var(--color-lime)" : "var(--color-pink)"} />
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-muted">Set some in My goals.</p>
+          )}
         </Card>
       </div>
 
-      <h2 className="display mb-4 mt-10 text-3xl">Body & fitness</h2>
-      <div className="grid gap-5 lg:grid-cols-2">
+      <h2 className="display mb-3 mt-8 text-2xl sm:mb-4 sm:mt-10 sm:text-3xl">Body & fitness</h2>
+      <div className="grid gap-4 sm:gap-5 lg:grid-cols-2">
         <Card>
           <CardHeader label="profile" title="Baseline" />
           <HealthProfileForm initial={{ ...profile, height_cm: profile.height_cm != null ? Number(profile.height_cm) : null, starting_weight_kg: profile.starting_weight_kg != null ? Number(profile.starting_weight_kg) : null, target_weight_kg: target }} wu={wu} lu={lu} />
@@ -181,7 +195,7 @@ export default async function MyHealthPage() {
               { key: "bodyfat", label: "body fat %", color: "#b8a6ff" },
             ]}
           />
-          <div className="mt-5 border-t border-line pt-5">
+          <div className="mt-4 border-t border-line/60 pt-4 sm:mt-5 sm:pt-5">
             <MeasurementForm today={today} lu={lu} />
           </div>
           <div className="mt-6">
@@ -199,9 +213,9 @@ export default async function MyHealthPage() {
 
 function BigStat({ label, value, unit, color }: { label: string; value: string; unit: string; color: string }) {
   return (
-    <div className="card p-4">
+    <div className="card px-3 py-2.5 sm:p-4">
       <div className="label-mono text-[10px]">{label}</div>
-      <div className="mt-1 font-display text-4xl font-black tabular-nums" style={{ color }}>
+      <div className="mt-0.5 font-display text-2xl font-black tabular-nums sm:mt-1 sm:text-4xl" style={{ color }}>
         {value}
         {value !== "–" ? <span className="ml-1 font-mono text-sm font-normal text-muted">{unit}</span> : null}
       </div>

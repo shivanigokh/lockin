@@ -24,13 +24,13 @@ export function HabitChecklist({ habits, day, shareHabits }: { habits: HabitRow[
   return (
     <div>
       <div className="mb-3 flex items-center gap-3">
-        <span className="font-display text-4xl font-black tabular-nums">
+        <span className="font-display text-2xl font-black tabular-nums sm:text-4xl">
           {done}
           <span className="text-faint">/{total}</span>
         </span>
         <ProgressBar value={total ? (done / total) * 100 : 0} className="flex-1" />
       </div>
-      <ul className="grid gap-2 sm:grid-cols-2">
+      <ul className="grid grid-cols-2 gap-2">
         {optimistic.map((h) => {
           const Icon = habitIcon(h.icon);
           return (
@@ -48,21 +48,21 @@ export function HabitChecklist({ habits, day, shareHabits }: { habits: HabitRow[
                   });
                 }}
                 className={cn(
-                  "flex w-full items-center gap-3 rounded-2xl border px-3 py-3 text-left transition cursor-pointer active:scale-[0.98]",
-                  h.done ? "border-lime/50 bg-lime/10" : "border-line bg-surface-2 hover:border-faint",
+                  "flex h-full min-h-14 w-full items-center gap-2.5 rounded-xl border px-2.5 py-2.5 text-left transition cursor-pointer active:scale-[0.97] sm:gap-3 sm:rounded-2xl sm:px-3 sm:py-3",
+                  h.done ? "border-lime/40 bg-lime/10" : "border-transparent bg-surface-2 hover:border-faint",
                 )}
               >
                 <span
                   className={cn(
-                    "flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition",
+                    "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition sm:h-8 sm:w-8 sm:rounded-xl",
                     h.done ? "bg-lime text-black animate-pop" : "bg-surface-3 text-muted",
                   )}
                 >
                   {h.done ? <Check className="h-5 w-5" strokeWidth={3} /> : <Icon className="h-4 w-4" />}
                 </span>
-                <span className={cn("flex-1 text-sm font-semibold", h.done && "text-lime")}>{h.name}</span>
+                <span className={cn("wrap-text flex-1 text-[13px] font-semibold leading-tight sm:text-sm", h.done && "text-lime")}>{h.name}</span>
                 {!h.visible_to_groups || !shareHabits ? (
-                  <EyeOff className="h-3.5 w-3.5 text-faint" aria-label="Hidden from squads" />
+                  <EyeOff className="h-3.5 w-3.5 shrink-0 text-faint" aria-label="Hidden from squads" />
                 ) : null}
               </button>
             </li>

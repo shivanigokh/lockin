@@ -39,11 +39,11 @@ export function Modal({
       )}
     >
       {open ? (
-        <div className="max-h-[88dvh] overflow-y-auto p-5 sm:p-6 animate-rise">
-          <div className="mb-5 flex items-start justify-between gap-4">
+        <div className="max-h-[90dvh] overflow-y-auto p-5 sm:p-6 animate-rise">
+          <div className="mb-4 flex items-start justify-between gap-4 sm:mb-5">
             <div>
-              {label ? <div className="label-mono mb-1">{label}</div> : null}
-              <h2 className="display text-2xl">{title}</h2>
+              {label ? <div className="label-mono mb-1 hidden sm:block">{label}</div> : null}
+              <h2 className="display text-xl sm:text-2xl">{title}</h2>
             </div>
             <button
               type="button"

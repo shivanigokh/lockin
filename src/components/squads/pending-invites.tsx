@@ -16,7 +16,7 @@ export function PendingInvites({ invites, className }: { invites: Invite[]; clas
         <li key={i.invite_id} className="card flex flex-wrap items-center gap-4 p-4">
           <SquadBadge g={i} size={40} />
           <div className="min-w-0 flex-1">
-            <div className="truncate font-bold">{i.group_name}</div>
+            <div className="wrap-text font-bold">{i.group_name}</div>
             <div className="text-xs text-muted">
               {i.invited_by ?? "Someone"} invited you · {i.member_count}/10 members
             </div>

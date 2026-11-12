@@ -3,16 +3,16 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-export type NavItem = { href: string; label: string; icon: LucideIcon; exact?: boolean };
+export type NavItem = { href: string; label: string; short?: string; icon: LucideIcon; exact?: boolean };
 
 export const squadNav = (id: string): NavItem[] => [
-  { href: `/g/${id}`, label: "Dashboard", icon: LayoutGrid, exact: true },
+  { href: `/g/${id}`, label: "Dashboard", short: "Today", icon: LayoutGrid, exact: true },
   { href: `/g/${id}/feed`, label: "Feed", icon: MessagesSquare },
   { href: `/g/${id}/leaderboard`, label: "Leaderboard", icon: Trophy },
   { href: `/g/${id}/goals`, label: "Shared goals", icon: Target },
   { href: `/g/${id}/challenges`, label: "Challenges", icon: Swords },
   { href: `/g/${id}/calendar`, label: "Calendar", icon: CalendarDays },
-  { href: `/g/${id}/squad`, label: "Squad", icon: Users },
+  { href: `/g/${id}/squad`, label: "Squad", short: "Members", icon: Users },
 ];
 
 export const personalNav: NavItem[] = [

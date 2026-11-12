@@ -63,7 +63,7 @@ export default async function SharedGoalsPage({ params }: { params: Promise<{ gr
                     {goals.map((g) => (
                       <li key={g.goal_id}>
                         <div className="mb-1.5 flex items-baseline justify-between gap-3">
-                          <span className="min-w-0 truncate font-semibold">{g.title}</span>
+                          <span className="min-w-0 wrap-text font-semibold">{g.title}</span>
                           <span className={cn("font-display text-2xl font-black tabular-nums", g.pct >= 100 ? "text-lime" : "text-ink")}>{g.pct}%</span>
                         </div>
                         <ProgressBar value={g.pct} size="lg" color={g.pct >= 100 ? "var(--color-lime)" : isMe ? "var(--color-pink)" : "var(--color-lavender)"} />

@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 export function SquadTabs({ groupId }: { groupId: string }) {
   const pathname = usePathname();
   return (
-    <nav className="scrollbar-none sticky top-[57px] z-30 flex gap-1 overflow-x-auto border-b border-line bg-bg/85 px-3 py-2 backdrop-blur md:hidden">
+    <nav data-scroll-x className="scrollbar-none flex gap-1 overflow-x-auto border-b border-line/60 px-3 pb-2 md:hidden">
       {squadNav(groupId).map((i) => {
         const active = isActive(pathname, i);
         return (
@@ -16,11 +16,11 @@ export function SquadTabs({ groupId }: { groupId: string }) {
             key={i.href}
             href={i.href}
             className={cn(
-              "whitespace-nowrap rounded-full px-3 py-1.5 font-mono text-[11px] uppercase tracking-wider transition",
-              active ? "bg-lime text-black" : "text-muted",
+              "whitespace-nowrap rounded-full px-3 py-1.5 text-[13px] font-semibold transition",
+              active ? "bg-surface-3 text-lime" : "text-muted",
             )}
           >
-            {i.label}
+            {i.short ?? i.label}
           </Link>
         );
       })}

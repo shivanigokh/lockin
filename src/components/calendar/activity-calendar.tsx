@@ -58,7 +58,7 @@ export function ActivityCalendar({
           <Link href={link({ d: prev })} className="rounded-xl border border-line p-2 text-muted transition hover:text-ink" aria-label="Previous">
             <ChevronLeft className="h-4 w-4" />
           </Link>
-          <h2 className="min-w-44 text-center font-display text-xl font-black uppercase">{title}</h2>
+          <h2 className="min-w-32 text-center font-display text-lg font-black uppercase leading-tight sm:min-w-44 sm:text-xl">{title}</h2>
           <Link href={link({ d: next })} className="rounded-xl border border-line p-2 text-muted transition hover:text-ink" aria-label="Next">
             <ChevronRight className="h-4 w-4" />
           </Link>
@@ -86,9 +86,9 @@ export function ActivityCalendar({
         </div>
       </div>
 
-      <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
+      <div className={cn("grid gap-1 sm:grid-cols-7 sm:gap-1.5", view === "week" ? "grid-cols-1" : "grid-cols-7")}>
         {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((w) => (
-          <div key={w} className="label-mono pb-1 text-center text-[10px]">
+          <div key={w} className={cn("label-mono pb-1 text-center text-[10px]", view === "week" && "hidden sm:block")}>
             {w}
           </div>
         ))}
@@ -103,15 +103,18 @@ export function ActivityCalendar({
             <div
               key={day}
               className={cn(
-                "relative flex flex-col rounded-xl border p-1.5 transition sm:p-2",
-                view === "week" ? "min-h-40" : "min-h-16 sm:min-h-24",
-                outside ? "border-transparent opacity-35" : "border-line bg-surface-2",
+                "relative flex flex-col rounded-lg border p-1.5 transition sm:rounded-xl sm:p-2",
+                view === "week" ? "min-h-11 sm:min-h-40" : "min-h-12 sm:min-h-24",
+                outside ? "border-transparent opacity-35" : "border-transparent bg-surface-2 sm:border-line",
                 isToday && "border-lime",
                 entries.length > 0 && !outside && "bg-[color-mix(in_srgb,var(--color-lime)_5%,var(--color-surface-2))]",
               )}
             >
               <div className="flex items-start justify-between">
-                <span className={cn("font-mono text-[11px]", isToday ? "text-lime" : "text-muted")}>{format(parseISO(day), "d")}</span>
+                <span className={cn("font-mono text-[11px]", isToday ? "text-lime" : "text-muted")}>
+                  {view === "week" ? <span className="sm:hidden">{format(parseISO(day), "EEE")} </span> : null}
+                  {format(parseISO(day), "d")}
+                </span>
                 {showHabits && info?.habitsDone ? (
                   <span
                     className={cn("rounded-full px-1 font-mono text-[9px]", info.allHabits ? "bg-lime text-black" : "bg-surface-3 text-muted")}
@@ -140,19 +143,19 @@ export function ActivityCalendar({
                   ))}
                 </div>
               ) : (
-                <ul className="mt-2 space-y-1">
+                <ul className="mt-1.5 flex flex-wrap gap-1 sm:mt-2 sm:block sm:space-y-1">
                   {evs.map((e, i) => (
-                    <li key={`e${i}`} className="flex items-center gap-1 truncate rounded-md bg-orange/10 px-1 py-0.5 text-[10px] text-orange">
+                    <li key={`e${i}`} className="flex items-center gap-1 rounded-md bg-orange/10 px-1.5 py-0.5 text-xs text-orange sm:truncate sm:px-1 sm:text-[10px]">
                       {e.kind === "start" ? <Swords className="h-3 w-3 shrink-0" /> : <Flag className="h-3 w-3 shrink-0" />}
-                      <span className="truncate">{e.label}</span>
+                      <span className="sm:truncate">{e.label}</span>
                     </li>
                   ))}
                   {entries.map((e, i) => {
                     const a = activity(e.type);
                     return (
-                      <li key={i} className="flex items-center gap-1 truncate rounded-md px-1 py-0.5 text-[10px] text-black" style={{ background: a.color }} title={`${e.who ? e.who + ": " : ""}${e.label} ${e.minutes}m`}>
+                      <li key={i} className="flex items-center gap-1 rounded-md px-1.5 py-0.5 text-xs text-black sm:truncate sm:px-1 sm:text-[10px]" style={{ background: a.color }} title={`${e.who ? e.who + ": " : ""}${e.label} ${e.minutes}m`}>
                         <a.icon className="h-3 w-3 shrink-0" />
-                        <span className="truncate">{e.who ?? `${e.minutes}m`}</span>
+                        <span className="sm:truncate">{e.who ? `${e.who} · ${e.minutes}m` : `${e.label} · ${e.minutes}m`}</span>
                       </li>
                     );
                   })}

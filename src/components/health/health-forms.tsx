@@ -180,7 +180,7 @@ export function MeasurementTable({ rows, lu }: { rows: Measurement[]; lu: Length
   if (!rows.length) return <p className="text-sm text-muted">No measurements yet.</p>;
   const used = MEASURE_FIELDS.filter((f) => rows.some((r) => r[f.key] != null));
   return (
-    <div className="overflow-x-auto">
+    <div data-scroll-x className="overflow-x-auto">
       <table className="w-full text-left text-sm">
         <thead>
           <tr className="label-mono text-[10px]">

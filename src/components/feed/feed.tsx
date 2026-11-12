@@ -103,10 +103,10 @@ export function Composer({ groupId }: { groupId: string }) {
             if (text.trim()) post(groupId, text);
           }
         }}
-        placeholder="Talk some (motivational) trash…"
-        className="!min-h-11 h-11 resize-none py-2.5"
+        placeholder="Say something…"
+        className="!min-h-10 h-10 resize-none py-2"
       />
-      <Button type="submit" loading={pending} disabled={!text.trim()} className="h-11">
+      <Button type="submit" loading={pending} disabled={!text.trim()} className="h-10">
         Post
       </Button>
     </form>
@@ -129,34 +129,31 @@ function FeedRow({ item, meId, groupId, isAdmin }: { item: FeedItemData; meId: s
   const [picker, setPicker] = useState(false);
 
   return (
-    <li className="group flex gap-3 py-3.5 animate-rise">
+    <li className="group flex gap-3 py-3 animate-rise">
       {item.actor ? (
-        <Avatar name={name} src={item.actor.avatar_url} seed={item.actor.id} size={36} />
+        <Avatar name={name} src={item.actor.avatar_url} seed={item.actor.id} size={32} />
       ) : (
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface-3">{icon}</span>
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface-3">{icon}</span>
       )}
       <div className="min-w-0 flex-1">
         {isMessage ? (
           <>
-            <div className="flex items-baseline gap-2">
-              <span className="text-sm font-bold">{item.actor?.id === meId ? "You" : name}</span>
-              <span className="label-mono text-[10px]">{relTime(item.created_at)}</span>
-            </div>
-            <p className="mt-0.5 whitespace-pre-wrap break-words text-[15px]">{item.body}</p>
+            <span className="wrap-text text-sm font-bold">{item.actor?.id === meId ? "You" : name}</span>
+            <p className="wrap-text mt-0.5 whitespace-pre-wrap text-[15px] leading-snug">{item.body}</p>
           </>
         ) : (
           <>
-            <p className="flex items-start gap-2 text-[15px] leading-snug">
+            <p className="flex items-start gap-2 text-sm leading-snug sm:text-[15px]">
               {item.actor ? <span className="mt-0.5 shrink-0">{icon}</span> : null}
-              <span>{text}</span>
+              <span className="wrap-text">{text}</span>
             </p>
             {item.kind === "workout" && item.payload.note ? (
               <p className="mt-1 border-l-2 border-line pl-3 text-sm italic text-muted">&ldquo;{String(item.payload.note)}&rdquo;</p>
             ) : null}
-            <span className="label-mono text-[10px]">{relTime(item.created_at)}</span>
           </>
         )}
-        <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+        <div className="mt-1 flex flex-wrap items-center gap-1.5">
+          <span className="mr-1 text-xs text-faint">{relTime(item.created_at)}</span>
           {counts.filter((r) => r.n > 0 || picker).map((r) => (
             <button
               key={r.key}
@@ -186,7 +183,7 @@ function FeedRow({ item, meId, groupId, isAdmin }: { item: FeedItemData; meId: s
             aria-label={picker ? "Close reactions" : "Add reaction"}
             aria-expanded={picker}
             onClick={() => setPicker((v) => !v)}
-            className="inline-flex h-7 items-center rounded-full border border-dashed border-line px-2 text-xs text-faint transition hover:border-faint hover:text-ink cursor-pointer"
+            className="inline-flex h-7 items-center rounded-full px-1.5 text-xs text-faint transition hover:text-ink cursor-pointer"
           >
             {picker ? "×" : <SmilePlus className="h-3.5 w-3.5" />}
           </button>
@@ -210,7 +207,7 @@ function FeedRow({ item, meId, groupId, isAdmin }: { item: FeedItemData; meId: s
 export function FeedList({ items, meId, groupId, isAdmin }: { items: FeedItemData[]; meId: string; groupId: string; isAdmin: boolean }) {
   if (!items.length) return <Empty title="Dead quiet." body="Log a workout or say something. Someone has to go first." />;
   return (
-    <ul className="divide-y divide-line">
+    <ul className="divide-y divide-line/60">
       {items.map((i) => (
         <FeedRow key={i.id + i.reactions.length} item={i} meId={meId} groupId={groupId} isAdmin={isAdmin} />
       ))}

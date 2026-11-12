@@ -40,9 +40,12 @@ export function WorkoutForm({
   const [visibility, setVisibility] = useState<"groups" | "private">(initial?.visibility ?? defaultVisibility);
   const [run, pending] = useAction(saveWorkout, { onSuccess: () => onDone?.() });
 
+  const [more, setMore] = useState(Boolean(initial && (initial.note || initial.performed_on !== today)));
+  const showDistance = DISTANCE_TYPES.includes(type) || distance !== "";
+
   return (
     <form
-      className="space-y-5"
+      className="space-y-4 sm:space-y-5"
       onSubmit={(e) => {
         e.preventDefault();
         run(initial?.id ?? null, {
@@ -65,13 +68,13 @@ export function WorkoutForm({
               onClick={() => setType(a.value)}
               aria-pressed={type === a.value}
               className={cn(
-                "flex flex-col items-center gap-1.5 rounded-2xl border px-1 py-3 text-[11px] font-semibold transition cursor-pointer",
-                type === a.value ? "border-transparent text-black" : "border-line bg-surface-2 text-muted hover:text-ink",
+                "flex flex-col items-center gap-1 rounded-xl border px-1 py-2.5 text-xs font-semibold transition cursor-pointer sm:rounded-2xl sm:py-3",
+                type === a.value ? "border-transparent text-black" : "border-transparent bg-surface-2 text-muted hover:text-ink",
               )}
               style={type === a.value ? { background: a.color } : undefined}
             >
               <a.icon className="h-5 w-5" />
-              <span className="truncate">{a.label.split(" ")[0]}</span>
+              <span>{a.label.split(" ")[0]}</span>
             </button>
           ))}
         </div>
@@ -79,15 +82,15 @@ export function WorkoutForm({
 
       <div>
         <div className="label-mono mb-2">Minutes</div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex gap-1.5">
           {QUICK_MINUTES.map((m) => (
             <button
               key={m}
               type="button"
               onClick={() => setMinutes(String(m))}
               className={cn(
-                "h-9 rounded-xl border px-3 font-mono text-sm transition cursor-pointer",
-                minutes === String(m) ? "border-lime bg-lime/10 text-lime" : "border-line text-muted hover:text-ink",
+                "h-10 min-w-0 flex-1 rounded-xl border font-mono text-sm transition cursor-pointer",
+                minutes === String(m) ? "border-lime bg-lime/10 text-lime" : "border-transparent bg-surface-2 text-muted hover:text-ink",
               )}
             >
               {m}
@@ -102,16 +105,13 @@ export function WorkoutForm({
             required
             value={minutes}
             onChange={(e) => setMinutes(e.target.value)}
-            className="h-9 w-24 py-1"
+            className="h-10 w-16 shrink-0 px-2 py-1 text-center"
           />
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <Field label="Date" htmlFor="w-date">
-          <Input id="w-date" type="date" required max={today} value={date} onChange={(e) => setDate(e.target.value)} />
-        </Field>
-        <Field label={DISTANCE_TYPES.includes(type) ? "Distance (km)" : "Distance (optional)"} htmlFor="w-dist">
+      {showDistance ? (
+        <Field label="Distance (km, optional)" htmlFor="w-dist">
           <Input
             id="w-dist"
             type="number"
@@ -119,22 +119,18 @@ export function WorkoutForm({
             step="0.01"
             min={0}
             max={1000}
-            placeholder="optional"
+            placeholder="e.g. 5"
             value={distance}
             onChange={(e) => setDistance(e.target.value)}
           />
         </Field>
-      </div>
+      ) : null}
 
-      <Field label="Note (optional)" htmlFor="w-note">
-        <Textarea id="w-note" maxLength={280} rows={2} placeholder="Ran from my problems. They kept up." value={note} onChange={(e) => setNote(e.target.value)} />
-      </Field>
-
-      <div className="grid grid-cols-2 gap-2">
+      <div className="flex rounded-xl bg-surface-2 p-1" role="group" aria-label="Who can see this">
         {(
           [
-            { v: "groups", label: "Share with squads", icon: Users, hint: "Counts on leaderboards" },
-            { v: "private", label: "Just me", icon: Lock, hint: "Hidden from everyone" },
+            { v: "groups", label: "Share with squads", icon: Users },
+            { v: "private", label: "Just me", icon: Lock },
           ] as const
         ).map((o) => (
           <button
@@ -143,22 +139,39 @@ export function WorkoutForm({
             onClick={() => setVisibility(o.v)}
             aria-pressed={visibility === o.v}
             className={cn(
-              "flex items-start gap-2 rounded-2xl border p-3 text-left transition cursor-pointer",
-              visibility === o.v ? "border-lime bg-lime/5" : "border-line hover:border-faint",
+              "flex flex-1 items-center justify-center gap-2 rounded-lg px-2 py-2 text-sm font-semibold transition cursor-pointer",
+              visibility === o.v ? "bg-surface-3 text-ink" : "text-muted hover:text-ink",
             )}
           >
-            <o.icon className={cn("mt-0.5 h-4 w-4", visibility === o.v ? "text-lime" : "text-muted")} />
-            <span>
-              <span className="block text-sm font-semibold">{o.label}</span>
-              <span className="block text-xs text-muted">{o.hint}</span>
-            </span>
+            <o.icon className={cn("h-4 w-4", visibility === o.v ? "text-lime" : "")} />
+            {o.label}
           </button>
         ))}
       </div>
+      <p className="-mt-2 text-xs text-muted">
+        {visibility === "groups" ? "Counts on your squads' leaderboards." : "Hidden from everyone. Still counts for your own goals."}
+      </p>
 
-      <Button type="submit" size="lg" className="w-full" loading={pending}>
-        {initial ? "Save changes" : "Log it"}
-      </Button>
+      {more ? (
+        <div className="space-y-4">
+          <Field label="Date" htmlFor="w-date">
+            <Input id="w-date" type="date" required max={today} value={date} onChange={(e) => setDate(e.target.value)} />
+          </Field>
+          <Field label="Note (optional)" htmlFor="w-note">
+            <Textarea id="w-note" maxLength={280} rows={2} placeholder="Ran from my problems. They kept up." value={note} onChange={(e) => setNote(e.target.value)} />
+          </Field>
+        </div>
+      ) : (
+        <button type="button" onClick={() => setMore(true)} className="text-sm text-muted underline-offset-4 hover:text-lime hover:underline cursor-pointer">
+          + Different day or add a note
+        </button>
+      )}
+
+      <div className="sticky bottom-0 -mx-5 -mb-5 bg-surface px-5 pt-2 pb-5 sm:static sm:m-0 sm:p-0">
+        <Button type="submit" size="lg" className="w-full" loading={pending}>
+          {initial ? "Save changes" : "Log it"}
+        </Button>
+      </div>
     </form>
   );
 }

@@ -66,12 +66,12 @@ export default async function LeaderboardPage({
     <Page>
       <PageHeader label={`// ${group.name}`} title="Leaderboard" sub={`${COPY.leaderboard} But your workout count is. One session = one workout. Never weight, calories or looks.`} />
 
-      <div className="mb-5 flex flex-wrap gap-2">
+      <div className="mb-4 flex flex-wrap gap-2 sm:mb-5">
         <SegmentLinks param="period" options={PERIODS} defaultValue="week" />
         <SegmentLinks param="by" options={[{ value: "workouts", label: "Sessions" }, { value: "minutes", label: "Minutes" }]} defaultValue="workouts" />
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
+      <div className="grid gap-4 sm:gap-5 lg:grid-cols-[1.4fr_1fr]">
         <Card>
           <CardHeader
             label={by === "minutes" ? "ranked by active minutes" : "ranked by workout sessions"}
@@ -84,24 +84,24 @@ export default async function LeaderboardPage({
                 <li
                   key={r.user_id}
                   className={cn(
-                    "flex items-center gap-3 rounded-2xl border px-3 py-3 transition",
-                    isMe ? "border-lime/50 bg-lime/5" : "border-line bg-surface-2",
+                    "flex items-center gap-3 rounded-xl border px-2.5 py-2.5 transition sm:rounded-2xl sm:px-3 sm:py-3",
+                    isMe ? "border-lime/40 bg-lime/5" : "border-transparent bg-surface-2 sm:border-line",
                   )}
                 >
-                  <span className={cn("w-7 text-center font-display text-2xl font-black", r.place === 1 && r.value > 0 ? "text-lime" : "text-faint")}>
+                  <span className={cn("w-6 shrink-0 text-center font-display text-xl font-black sm:w-7 sm:text-2xl", r.place === 1 && r.value > 0 ? "text-lime" : "text-faint")}>
                     {r.place}
                   </span>
                   <span className="relative">
-                    <Avatar name={displayName(r)} src={r.avatar_url} seed={r.user_id} size={38} />
+                    <Avatar name={displayName(r)} src={r.avatar_url} seed={r.user_id} size={34} />
                     {r.place === 1 && r.value > 0 ? <Crown className="absolute -right-1.5 -top-2.5 h-4 w-4 rotate-12 text-lime" /> : null}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm font-bold">{isMe ? "You" : displayName(r)}</div>
+                    <div className="wrap-text text-sm font-bold">{isMe ? "You" : displayName(r)}</div>
                     <ProgressBar value={(r.value / top) * 100} size="sm" color={isMe ? "var(--color-lime)" : "var(--color-lavender)"} className="mt-1.5" />
                   </div>
-                  <div className="text-right">
+                  <div className="shrink-0 text-right">
                     <div className="font-mono text-lg font-bold tabular-nums">{r.workouts}</div>
-                    <div className="label-mono text-[9px]">{r.active_minutes} min</div>
+                    <div className="text-[11px] text-muted">{r.active_minutes} min</div>
                   </div>
                 </li>
               );
@@ -112,15 +112,15 @@ export default async function LeaderboardPage({
           ) : null}
         </Card>
 
-        <div className="space-y-5">
+        <div className="space-y-4 sm:space-y-5">
           <Card>
             <CardHeader label="rotating awards" title="Hall of fame" />
             <ul className="space-y-2">
               {Object.entries(AWARDS).map(([key, a]) => {
                 const w = awards?.find((x) => x.award === key);
                 return (
-                  <li key={key} className="flex items-center gap-3 rounded-2xl border border-line bg-surface-2 p-3">
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" style={{ background: `color-mix(in srgb, ${a.color} 15%, transparent)`, color: a.color }}>
+                  <li key={key} className="flex items-center gap-3 rounded-xl bg-surface-2 p-2.5 sm:rounded-2xl sm:border sm:border-line sm:p-3">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg sm:h-10 sm:w-10 sm:rounded-xl" style={{ background: `color-mix(in srgb, ${a.color} 15%, transparent)`, color: a.color }}>
                       <a.icon className="h-5 w-5" />
                     </span>
                     <div className="min-w-0 flex-1">
@@ -129,8 +129,8 @@ export default async function LeaderboardPage({
                       </div>
                       {w ? (
                         <>
-                          <div className="truncate text-sm font-bold">{w.user_id === me.user.id ? "You" : displayName(w)}</div>
-                          <div className="truncate text-xs text-muted">{w.detail}</div>
+                          <div className="wrap-text text-sm font-bold">{w.user_id === me.user.id ? "You" : displayName(w)}</div>
+                          <div className="wrap-text text-xs text-muted">{w.detail}</div>
                         </>
                       ) : (
                         <div className="text-sm text-faint">Up for grabs. {a.blurb}.</div>
@@ -145,7 +145,7 @@ export default async function LeaderboardPage({
               <Lock className="h-3 w-3" /> Awards recalculate from squad-visible workouts.
             </p>
           </Card>
-          <Card>
+          <Card className="hidden sm:block">
             <CardHeader label="visualised" title="Who's carrying" />
             <LeaderboardChart
               data={ranked.map((r) => ({ name: r.user_id === me.user.id ? "You" : displayName(r), value: r.value, me: r.user_id === me.user.id }))}

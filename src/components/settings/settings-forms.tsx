@@ -1,7 +1,7 @@
 "use client";
 import { useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowDown, ArrowUp, Camera, Eye, EyeOff, Plus, Archive, ArchiveRestore, LogOut, Pencil } from "lucide-react";
+import { ArrowDown, ArrowUp, Camera, EyeOff, Plus, Archive, ArchiveRestore, LogOut, Pencil } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Select, Textarea, Toggle } from "@/components/ui/field";
@@ -218,22 +218,24 @@ export function HabitManager({ habits }: { habits: Habit[] }) {
         {active.map((h, i) => {
           const I = habitIcon(h.icon);
           return (
-            <li key={h.id} className="flex items-center gap-2 rounded-2xl border border-line bg-surface-2 px-3 py-2">
-              <I className="h-4 w-4 text-lime" />
-              <span className="flex-1 truncate text-sm font-semibold">{h.name}</span>
-              {h.visible_to_groups ? <Eye className="h-3.5 w-3.5 text-muted" aria-label="Visible to squads" /> : <EyeOff className="h-3.5 w-3.5 text-faint" aria-label="Hidden from squads" />}
-              <Button variant="ghost" size="icon" aria-label="Move up" disabled={i === 0 || moving} onClick={() => move(h.id, -1)}>
+            <li key={h.id} className="flex items-center gap-2 rounded-xl bg-surface-2 py-1.5 pl-3 pr-1 sm:rounded-2xl sm:border sm:border-line sm:px-3 sm:py-2">
+              <I className="h-4 w-4 shrink-0 text-lime" />
+              <span className="flex-1 wrap-text text-sm font-semibold">{h.name}</span>
+              {h.visible_to_groups ? null : <EyeOff className="h-3.5 w-3.5 shrink-0 text-faint" aria-label="Hidden from squads" />}
+              <div className="flex shrink-0">
+              <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Move up" disabled={i === 0 || moving} onClick={() => move(h.id, -1)}>
                 <ArrowUp className="h-3.5 w-3.5" />
               </Button>
-              <Button variant="ghost" size="icon" aria-label="Move down" disabled={i === active.length - 1 || moving} onClick={() => move(h.id, 1)}>
+              <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Move down" disabled={i === active.length - 1 || moving} onClick={() => move(h.id, 1)}>
                 <ArrowDown className="h-3.5 w-3.5" />
               </Button>
-              <Button variant="ghost" size="icon" aria-label="Edit habit" onClick={() => setEditing(h)}>
+              <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Edit habit" onClick={() => setEditing(h)}>
                 <Pencil className="h-3.5 w-3.5" />
               </Button>
-              <Button variant="ghost" size="icon" aria-label="Archive habit" disabled={archiving} onClick={() => archive(h.id, true)}>
+              <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Archive habit" disabled={archiving} onClick={() => archive(h.id, true)}>
                 <Archive className="h-3.5 w-3.5" />
               </Button>
+              </div>
             </li>
           );
         })}
@@ -272,7 +274,7 @@ export function MySquads({ groups }: { groups: MyGroup[] }) {
         <li key={g.id} className="flex flex-wrap items-center gap-3 rounded-2xl border border-line bg-surface-2 px-3 py-2.5">
           <SquadBadge g={g} size={32} />
           <div className="min-w-0 flex-1">
-            <Link href={`/g/${g.id}/squad`} className="block truncate text-sm font-semibold hover:text-lime">
+            <Link href={`/g/${g.id}/squad`} className="block wrap-text text-sm font-semibold hover:text-lime">
               {g.name}
             </Link>
             <span className="label-mono text-[10px]">

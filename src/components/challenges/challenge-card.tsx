@@ -70,8 +70,8 @@ export function ChallengeCard({ c, groupId, meId }: { c: ChallengeView; groupId:
             ) : null}
             <Badge>{c.scope === "group" ? "squad total" : "each person"}</Badge>
           </div>
-          <h3 className="flex items-center gap-2 text-xl font-bold">
-            <Swords className="h-5 w-5 shrink-0 text-orange" /> <span className="truncate">{c.title}</span>
+          <h3 className="flex items-center gap-2 text-lg font-bold leading-tight sm:text-xl">
+            <Swords className="h-5 w-5 shrink-0 text-orange" /> <span className="wrap-text">{c.title}</span>
           </h3>
           {c.description ? <p className="mt-1 text-sm text-muted">{c.description}</p> : null}
         </div>
@@ -88,20 +88,10 @@ export function ChallengeCard({ c, groupId, meId }: { c: ChallengeView; groupId:
         ) : null}
       </div>
 
-      <div className="mb-4 grid grid-cols-3 gap-2 font-mono text-xs">
-        <div className="rounded-xl bg-surface-2 p-2.5">
-          <div className="label-mono text-[9px]">target</div>
-          {fmtNum(c.target)} {c.unit}
-        </div>
-        <div className="rounded-xl bg-surface-2 p-2.5">
-          <div className="label-mono text-[9px]">counts</div>
-          <span className="line-clamp-1">{metricLabel(c)}</span>
-        </div>
-        <div className="rounded-xl bg-surface-2 p-2.5">
-          <div className="label-mono text-[9px]">dates</div>
-          {prettyDate(c.start_date).slice(4)} → {prettyDate(c.end_date).slice(4)}
-        </div>
-      </div>
+      <p className="mb-4 text-sm text-muted">
+        Target <span className="font-semibold text-ink">{fmtNum(c.target)} {c.unit}</span> · counts {metricLabel(c).toLowerCase()} ·{" "}
+        {prettyDate(c.start_date).slice(4)} → {prettyDate(c.end_date).slice(4)}
+      </p>
 
       {c.scope === "group" ? (
         <div className="mb-4">
@@ -115,7 +105,7 @@ export function ChallengeCard({ c, groupId, meId }: { c: ChallengeView; groupId:
         </div>
       ) : null}
 
-      <div className="label-mono mb-2 flex items-center gap-1.5">
+      <div className="mb-2 flex items-center gap-1.5 text-xs text-muted">
         <Users className="h-3 w-3" /> {c.board.length} {c.board.length === 1 ? "participant" : "participants"}
       </div>
       <ul className="space-y-2.5">
@@ -124,19 +114,23 @@ export function ChallengeCard({ c, groupId, meId }: { c: ChallengeView; groupId:
           return (
             <li key={b.user_id} className="flex items-center gap-2.5">
               <Avatar name={displayName(b)} src={b.avatar_url} seed={b.user_id} size={26} />
-              <span className="w-20 truncate text-sm font-semibold">{b.user_id === meId ? "You" : displayName(b)}</span>
-              <ProgressBar value={pct} size="sm" color={b.user_id === meId ? "var(--color-lime)" : "var(--color-lavender)"} className="flex-1" />
-              <span className="w-24 text-right font-mono text-xs text-muted">
-                {fmtNum(b.progress)}
-                {c.scope === "individual" ? ` / ${fmtNum(c.target)} · ${b.pct}%` : ` ${c.unit}`}
-              </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="wrap-text text-sm font-semibold">{b.user_id === meId ? "You" : displayName(b)}</span>
+                  <span className="shrink-0 font-mono text-xs text-muted">
+                    {fmtNum(b.progress)}
+                    {c.scope === "individual" ? ` / ${fmtNum(c.target)} · ${b.pct}%` : ` ${c.unit}`}
+                  </span>
+                </div>
+                <ProgressBar value={pct} size="sm" color={b.user_id === meId ? "var(--color-lime)" : "var(--color-lavender)"} className="mt-1" />
+              </div>
             </li>
           );
         })}
       </ul>
 
       {c.status !== "ended" ? (
-        <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-line pt-4">
+        <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-line/60 pt-3">
           {c.joined ? (
             <>
               {c.metric === "manual" && c.status === "active" ? (

@@ -90,7 +90,7 @@ export default async function AdminPage() {
                 <div className="mb-3 flex items-center gap-3">
                   <SquadBadge g={{ icon: g.icon, color: g.color }} size={40} />
                   <div className="min-w-0 flex-1">
-                    <div className="truncate font-bold">{g.name}</div>
+                    <div className="wrap-text font-bold">{g.name}</div>
                     <div className="label-mono text-[10px]">
                       {g.member_count}/10 · {g.member_count < MIN_MEMBERS ? "filling" : "active"} · created {relTime(g.created_at)}
                     </div>
@@ -101,7 +101,7 @@ export default async function AdminPage() {
                   {members.map((m) => (
                     <li key={m.username} className="flex items-center gap-2.5 text-sm">
                       <Avatar name={displayName(m)} src={m.avatar_url} seed={m.username} size={24} />
-                      <span className="min-w-0 flex-1 truncate">
+                      <span className="min-w-0 flex-1 wrap-text">
                         <span className="font-semibold">{displayName(m)}</span> <span className="text-muted">@{m.username}</span>
                       </span>
                       {m.role === "admin" ? <Badge color="var(--color-lime)">admin</Badge> : null}

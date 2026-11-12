@@ -35,37 +35,43 @@ export default async function SquadPage({ params, searchParams }: { params: Prom
   return (
     <Page className="max-w-4xl">
       <PageHeader label="// squad hq" title={group.name} sub={group.description ?? undefined}>
-        <SquadBadge g={group} size={56} />
+        <span className="hidden sm:block">
+          <SquadBadge g={group} size={56} />
+        </span>
       </PageHeader>
 
       {created ? (
-        <Card className="mb-5 border-lime/50 bg-lime/5">
-          <p className="label-mono text-lime">// squad created</p>
-          <p className="mt-1 font-semibold">Now send the invite code to 2+ friends. The squad unlocks at {MIN_MEMBERS} members.</p>
+        <Card className="mb-4 border-lime/50 bg-lime/5 sm:mb-5">
+          <p className="label-mono hidden text-lime sm:block">// squad created</p>
+          <p className="font-semibold sm:mt-1">Now send the invite code to 2+ friends. The squad unlocks at {MIN_MEMBERS} members.</p>
         </Card>
       ) : null}
 
-      <Card className="mb-5">
-        <div className="mb-2 flex items-baseline justify-between">
-          <span className="label-mono">{group.member_count < MIN_MEMBERS ? "filling up" : "active"}</span>
-          <span className="font-mono text-sm">
-            {group.member_count}/{MAX_MEMBERS} members
-          </span>
-        </div>
-        <ProgressBar value={(group.member_count / MAX_MEMBERS) * 100} color={group.member_count < MIN_MEMBERS ? "var(--color-pink)" : "var(--color-lime)"} />
-        <p className="mt-2 text-xs text-muted">
-          {group.member_count < MIN_MEMBERS
-            ? `${MIN_MEMBERS - group.member_count} more to unlock leaderboards and challenges.`
-            : group.member_count >= MAX_MEMBERS
-              ? "Full house. Someone has to leave before anyone else joins."
-              : `Room for ${MAX_MEMBERS - group.member_count} more.`}
-        </p>
-      </Card>
+      <div className="grid gap-4 sm:gap-5">
+        <Card>
+          <CardHeader label="the roster" title={`Members · ${group.member_count}/${MAX_MEMBERS}`} />
+          <div className="mb-4">
+            <ProgressBar value={(group.member_count / MAX_MEMBERS) * 100} size="sm" color={group.member_count < MIN_MEMBERS ? "var(--color-pink)" : "var(--color-lime)"} />
+            <p className="mt-1.5 text-xs text-muted">
+              {group.member_count < MIN_MEMBERS
+                ? `${MIN_MEMBERS - group.member_count} more to unlock leaderboards and challenges.`
+                : group.member_count >= MAX_MEMBERS
+                  ? "Full house. Someone has to leave before anyone else joins."
+                  : `Room for ${MAX_MEMBERS - group.member_count} more.`}
+            </p>
+          </div>
 
-      <div className="grid gap-5">
+          <MembersList
+            groupId={groupId}
+            meId={me.user.id}
+            isAdmin={isAdmin}
+            members={(members ?? []).map((m) => ({ ...m, profile: m.profile as unknown as { id: string; username: string; display_name: string | null; avatar_url: string | null } }))}
+          />
+        </Card>
+
         {canInvite && group.member_count < MAX_MEMBERS ? (
           <Card>
-            <CardHeader label="invitations" title="Recruit" />
+            <CardHeader label="invitations" title="Invite friends" />
             <InviteManager
               groupId={groupId}
               groupName={group.name}
@@ -75,16 +81,6 @@ export default async function SquadPage({ params, searchParams }: { params: Prom
             />
           </Card>
         ) : null}
-
-        <Card>
-          <CardHeader label="members" title="The roster" />
-          <MembersList
-            groupId={groupId}
-            meId={me.user.id}
-            isAdmin={isAdmin}
-            members={(members ?? []).map((m) => ({ ...m, profile: m.profile as unknown as { id: string; username: string; display_name: string | null; avatar_url: string | null } }))}
-          />
-        </Card>
 
         {isAdmin ? (
           <Card>

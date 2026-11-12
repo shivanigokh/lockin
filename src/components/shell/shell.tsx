@@ -63,7 +63,7 @@ export function Shell({
 
   const bottom: NavItem[] = [
     { href: activeId ? `/g/${activeId}` : "/home", label: "Squad", icon: LayoutGrid, exact: true },
-    { href: activeId ? `/g/${activeId}/leaderboard` : "/home", label: "Board", icon: Trophy },
+    { href: activeId ? `/g/${activeId}/leaderboard` : "/home#board", label: "Board", icon: Trophy },
     { href: "/goals", label: "Goals", icon: Target },
     { href: "/me", label: "Me", icon: HeartPulse },
   ];
@@ -136,11 +136,11 @@ export function Shell({
       </aside>
 
       {/* mobile top bar */}
-      <header className="sticky top-0 z-40 flex items-center gap-2 border-b border-line bg-bg/85 px-3 py-2.5 backdrop-blur md:hidden">
+      <header className="sticky top-0 z-40 flex items-center gap-1.5 bg-bg/90 px-3 py-2 backdrop-blur md:hidden">
         <Link href="/home" aria-label="Home" className="group">
           <Logo compact />
         </Link>
-        <SquadSwitcher groups={groups} activeId={activeId} className="min-w-0 flex-1" />
+        <SquadSwitcher groups={groups} activeId={activeId} className="min-w-0 flex-1" compact />
         <Link href="/notifications" className="relative rounded-xl p-2 text-muted" aria-label="Notifications">
           <Bell className="h-5 w-5" />
           {unread > 0 ? <span className="absolute right-1 top-1 h-2.5 w-2.5 rounded-full bg-pink" /> : null}
@@ -150,10 +150,10 @@ export function Shell({
         </Link>
       </header>
 
-      <main className="min-w-0 pb-28 md:pb-12">{children}</main>
+      <main className="min-w-0 pb-24 md:pb-12">{children}</main>
 
       {/* mobile bottom nav */}
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-bg/90 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line/60 bg-bg/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
         <div className="mx-auto grid max-w-md grid-cols-5 items-center px-2 py-1.5">
           {bottom.slice(0, 2).map((i) => (
             <BottomLink key={i.label} item={i} pathname={pathname} />

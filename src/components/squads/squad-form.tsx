@@ -49,12 +49,12 @@ export function SquadForm({ initial }: { initial?: Initial }) {
       }}
     >
       <div className="flex items-center gap-4">
-        <span className="flex h-20 w-20 shrink-0 items-center justify-center rounded-3xl text-black transition" style={{ background: colorVar(color) }}>
-          <Icon className="h-10 w-10" />
+        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-black transition sm:h-20 sm:w-20 sm:rounded-3xl" style={{ background: colorVar(color) }}>
+          <Icon className="h-7 w-7 sm:h-10 sm:w-10" />
         </span>
         <div className="min-w-0">
           <div className="label-mono">preview</div>
-          <div className="display truncate text-3xl">{name || "Your squad"}</div>
+          <div className="display wrap-text text-xl sm:text-3xl">{name || "Your squad"}</div>
         </div>
       </div>
 

@@ -64,7 +64,7 @@ await step("create squad (filling state)", async () => {
   groupUrl = p1.url().replace(/\/squad.*$/, "");
   code = (await p1.locator("button[title='Copy code']").first().innerText()).trim();
   if (!/^[A-Z0-9]{8}$/.test(code)) throw new Error("no invite code: " + code);
-  await p1.getByText("1/10 members").waitFor();
+  await p1.getByText("Members · 1/10").waitFor();
 });
 
 await step("invite link preview + join (2nd and 3rd member)", async () => {
@@ -75,7 +75,7 @@ await step("invite link preview + join (2nd and 3rd member)", async () => {
     await u.page.waitForURL(/\/g\/[0-9a-f-]{36}$/);
   }
   await p1.goto(`${groupUrl}/squad`);
-  await p1.getByText("3/10 members").waitFor();
+  await p1.getByText("Members · 3/10").waitFor();
 });
 
 await step("tick habits on dashboard", async () => {

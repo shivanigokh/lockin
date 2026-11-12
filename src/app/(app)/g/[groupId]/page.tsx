@@ -14,8 +14,8 @@ import { Composer, FeedList } from "@/components/feed/feed";
 import { InviteLink } from "@/components/squad/invite-panel";
 import { SquadBadge } from "@/components/shell/squad-switcher";
 import { MyTodayWorkouts } from "@/components/tracking/my-today-workouts";
-import { COPY, MIN_MEMBERS, habitIcon } from "@/lib/constants";
-import { cn, displayName } from "@/lib/utils";
+import { COPY, MIN_MEMBERS } from "@/lib/constants";
+import { displayName } from "@/lib/utils";
 import { prettyDate } from "@/lib/dates";
 
 export const metadata: Metadata = { title: "Squad" };
@@ -58,26 +58,29 @@ export default async function GroupDashboard({ params }: { params: Promise<{ gro
 
   return (
     <Page>
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-4 sm:mb-6">
         <div className="flex min-w-0 items-center gap-4">
-          <SquadBadge g={group} size={56} />
+          <span className="hidden sm:block">
+            <SquadBadge g={group} size={56} />
+          </span>
           <div className="min-w-0">
-            <p className="label-mono text-lime">// {prettyDate(today)}</p>
-            <h1 className="display truncate text-3xl sm:text-5xl">{group.name}</h1>
+            <p className="label-mono text-lime">{prettyDate(today)}</p>
+            <h1 className="display wrap-text hidden text-5xl sm:block">{group.name}</h1>
+            <p className="mt-1 text-sm text-muted sm:hidden">{greeting}</p>
           </div>
         </div>
         <p className="label-mono hidden sm:block">{greeting}</p>
       </div>
 
       {filling ? (
-        <Card className="mb-5 border-pink/40 bg-[color-mix(in_srgb,var(--color-pink)_6%,var(--color-surface))]">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <Card className="mb-4 border-pink/40 bg-[color-mix(in_srgb,var(--color-pink)_6%,var(--color-surface))] sm:mb-5">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className="label-mono text-pink">// squad filling · {group.member_count}/{MIN_MEMBERS} to unlock</p>
-              <h2 className="mt-1 text-xl font-bold">
-                Recruit {MIN_MEMBERS - group.member_count} more {MIN_MEMBERS - group.member_count === 1 ? "friend" : "friends"} to unlock leaderboards and challenges.
+              <p className="label-mono hidden text-pink sm:block">// squad filling · {group.member_count}/{MIN_MEMBERS} to unlock</p>
+              <h2 className="text-base font-bold sm:mt-1 sm:text-xl">
+                Invite {MIN_MEMBERS - group.member_count} more {MIN_MEMBERS - group.member_count === 1 ? "friend" : "friends"} to unlock leaderboards and challenges.
               </h2>
-              <p className="mt-1 text-sm text-muted">You can already log workouts and tick habits. Peer pressure starts at 3.</p>
+              <p className="mt-1 hidden text-sm text-muted sm:block">You can already log workouts and tick habits. Peer pressure starts at 3.</p>
             </div>
             {code ? <InviteLink code={code} groupName={group.name} /> : (
               <Link href={`/g/${groupId}/squad`} className="text-sm text-lime hover:underline">Create an invite code →</Link>
@@ -86,24 +89,25 @@ export default async function GroupDashboard({ params }: { params: Promise<{ gro
         </Card>
       ) : null}
 
-      <div className="grid gap-5 lg:grid-cols-[1.35fr_1fr]">
-        <div className="space-y-5">
-          <Card>
+      {/* On phones the two columns collapse into one list, ordered by what you do most. */}
+      <div className="flex flex-col gap-4 lg:grid lg:grid-cols-[1.35fr_1fr] lg:items-start lg:gap-5">
+        <div className="contents lg:block lg:space-y-5">
+          <Card className="order-1">
             <CardHeader label="today's accountability" title="Did you though?" />
             <HabitChecklist habits={habits} day={today} shareHabits={me.settings.share_habits} />
           </Card>
 
-          <Card>
-            <CardHeader label="your workouts today" title={myWorkouts.data?.length ? "Receipts" : "Nothing logged yet"} />
+          <Card className="order-2">
+            <CardHeader label="your workouts today" title={myWorkouts.data?.length ? "Today's workouts" : "Nothing logged yet"} />
             <MyTodayWorkouts workouts={myWorkouts.data ?? []} today={today} defaultVisibility={me.settings.default_workout_visibility} />
           </Card>
 
-          <Card>
+          <Card className="order-5">
             <CardHeader
               label="squad feed"
               title="What's happening"
               action={
-                <Link href={`/g/${groupId}/feed`} className="inline-flex items-center gap-1 text-xs text-muted hover:text-lime">
+                <Link href={`/g/${groupId}/feed`} className="inline-flex items-center gap-1 py-1 text-xs text-muted hover:text-lime">
                   All <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               }
@@ -113,66 +117,51 @@ export default async function GroupDashboard({ params }: { params: Promise<{ gro
           </Card>
         </div>
 
-        <div className="space-y-5">
-          <Card>
-            <CardHeader label="this week" title="Squad pulse" />
-            <div className="grid grid-cols-2 gap-3">
-              <Stat value={squadWeek} label="squad workouts" color="var(--color-lime)" />
-              <Stat value={myRow?.workouts ?? 0} label="yours" color="var(--color-pink)" sub={myRow && !filling ? `#${myRow.rank} of ${lb.length}` : undefined} />
+        <div className="contents lg:block lg:space-y-5">
+          <Card className="order-3">
+            <CardHeader
+              label="squad check-ins"
+              title="Your squad today"
+              action={
+                <Link href={`/g/${groupId}/leaderboard`} className="inline-flex items-center gap-1 py-1 text-xs text-muted hover:text-lime">
+                  <Trophy className="h-3.5 w-3.5" /> Board
+                </Link>
+              }
+            />
+            <div className="mb-4 grid grid-cols-2 gap-2">
+              <Stat value={squadWeek} label="squad workouts this week" color="var(--color-lime)" />
+              <Stat value={myRow?.workouts ?? 0} label={myRow && !filling ? `yours · #${myRow.rank} of ${lb.length}` : "yours this week"} color="var(--color-pink)" />
             </div>
-            {!filling ? (
-              <ol className="mt-4 space-y-2">
-                {lb.slice(0, 3).map((r, i) => (
-                  <li key={r.user_id} className="flex items-center gap-3">
-                    <span className={cn("w-5 font-mono text-sm", i === 0 ? "text-lime" : "text-muted")}>{r.rank}</span>
-                    <Avatar name={displayName(r)} src={r.avatar_url} seed={r.user_id} size={28} />
-                    <span className="flex-1 truncate text-sm font-semibold">{r.user_id === me.user.id ? "You" : displayName(r)}</span>
-                    <span className="font-mono text-sm">{r.workouts}</span>
-                  </li>
-                ))}
-              </ol>
-            ) : null}
-            <Link href={`/g/${groupId}/leaderboard`} className="mt-4 inline-flex items-center gap-1.5 text-xs text-muted hover:text-lime">
-              <Trophy className="h-3.5 w-3.5" /> Full leaderboard
-            </Link>
-          </Card>
-
-          <Card>
-            <CardHeader label="squad check-ins" title="Who's locked in today" />
             <ul className="space-y-3">
               {(squadToday.data ?? []).map((m) => {
                 const pct = m.total ? (m.done / m.total) * 100 : 0;
-                const hs = (m.habits as { name: string; icon: string; done: boolean }[]) ?? [];
+                const wk = lb.find((r) => r.user_id === m.user_id)?.workouts ?? 0;
                 return (
-                  <li key={m.user_id}>
-                    <div className="mb-1.5 flex items-center gap-2.5">
-                      <Avatar name={displayName(m)} src={m.avatar_url} seed={m.user_id} size={28} />
-                      <span className="flex-1 truncate text-sm font-semibold">{m.user_id === me.user.id ? "You" : displayName(m)}</span>
-                      <span className="font-mono text-xs text-muted">{m.total ? `${m.done}/${m.total}` : "private"}</span>
-                    </div>
-                    {m.total ? (
-                      <div className="flex items-center gap-2 pl-[38px]">
-                        <ProgressBar value={pct} size="sm" color={pct >= 100 ? "var(--color-lime)" : "var(--color-lavender)"} className="flex-1" />
-                        <span className="flex gap-0.5">
-                          {hs.map((h, i) => {
-                            const I = habitIcon(h.icon);
-                            return <I key={i} className={cn("h-3.5 w-3.5", h.done ? "text-lime" : "text-faint")} aria-label={`${h.name}: ${h.done ? "done" : "not yet"}`} />;
-                          })}
+                  <li key={m.user_id} className="flex items-center gap-3">
+                    <Avatar name={displayName(m)} src={m.avatar_url} seed={m.user_id} size={30} />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-baseline justify-between gap-2">
+                        <span className="wrap-text text-sm font-semibold">{m.user_id === me.user.id ? "You" : displayName(m)}</span>
+                        <span className="shrink-0 font-mono text-[11px] text-muted">
+                          {m.total ? `${m.done}/${m.total} habits` : "habits private"} · {wk} wk
                         </span>
                       </div>
-                    ) : null}
+                      {m.total ? (
+                        <ProgressBar value={pct} size="sm" color={pct >= 100 ? "var(--color-lime)" : "var(--color-lavender)"} className="mt-1.5" />
+                      ) : null}
+                    </div>
                   </li>
                 );
               })}
             </ul>
           </Card>
 
-          <Card>
+          <Card className="order-4">
             <CardHeader
               label="challenges"
-              title={filling ? "Locked" : challenges.data?.length ? "Live now" : "None running"}
+              title={filling ? "Challenges locked" : challenges.data?.length ? "Challenges live now" : "No challenges running"}
               action={
-                <Link href={`/g/${groupId}/challenges`} className="inline-flex items-center gap-1 text-xs text-muted hover:text-lime">
+                <Link href={`/g/${groupId}/challenges`} className="inline-flex items-center gap-1 py-1 text-xs text-muted hover:text-lime">
                   All <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               }
@@ -180,13 +169,13 @@ export default async function GroupDashboard({ params }: { params: Promise<{ gro
             {filling ? (
               <p className="text-sm text-muted">Challenges unlock at {MIN_MEMBERS} members.</p>
             ) : challenges.data?.length ? (
-              <ul className="space-y-2">
+              <ul className="space-y-1">
                 {challenges.data.map((c) => (
                   <li key={c.id}>
-                    <Link href={`/g/${groupId}/challenges#${c.id}`} className="flex items-center gap-3 rounded-xl border border-line px-3 py-2.5 transition hover:border-orange">
-                      <Swords className="h-4 w-4 text-orange" />
-                      <span className="flex-1 truncate text-sm font-semibold">{c.title}</span>
-                      <span className="label-mono text-[10px]">ends {prettyDate(c.end_date)}</span>
+                    <Link href={`/g/${groupId}/challenges#${c.id}`} className="-mx-2 flex items-center gap-3 rounded-xl px-2 py-2 transition hover:bg-surface-2">
+                      <Swords className="h-4 w-4 shrink-0 text-orange" />
+                      <span className="wrap-text flex-1 text-sm font-semibold">{c.title}</span>
+                      <span className="shrink-0 text-xs text-muted">ends {prettyDate(c.end_date)}</span>
                     </Link>
                   </li>
                 ))}
@@ -196,8 +185,8 @@ export default async function GroupDashboard({ params }: { params: Promise<{ gro
             )}
           </Card>
 
-          <Link href={`/g/${groupId}/squad`} className="card flex items-center gap-3 p-4 text-sm text-muted transition hover:text-ink">
-            <Users className="h-4 w-4" /> {group.member_count}/10 members · {isAdmin ? "you're an admin" : "manage squad"}
+          <Link href={`/g/${groupId}/squad`} className="order-6 flex items-center gap-3 px-1 py-2 text-sm text-muted transition hover:text-ink lg:rounded-[var(--radius-card)] lg:border lg:border-line lg:bg-surface lg:p-4">
+            <Users className="h-4 w-4" /> {group.member_count}/10 members · {isAdmin ? "you're an admin" : "see the squad"}
             <ArrowRight className="ml-auto h-4 w-4" />
           </Link>
         </div>
@@ -206,14 +195,13 @@ export default async function GroupDashboard({ params }: { params: Promise<{ gro
   );
 }
 
-function Stat({ value, label, color, sub }: { value: number; label: string; color: string; sub?: string }) {
+function Stat({ value, label, color }: { value: number; label: string; color: string }) {
   return (
-    <div className="rounded-2xl border border-line bg-surface-2 p-4">
-      <div className="font-display text-4xl font-black tabular-nums" style={{ color }}>
+    <div className="rounded-xl bg-surface-2 px-3 py-2.5">
+      <div className="font-display text-3xl font-black tabular-nums" style={{ color }}>
         {value}
       </div>
-      <div className="label-mono mt-1 text-[10px]">{label}</div>
-      {sub ? <div className="mt-1 font-mono text-xs text-ink">{sub}</div> : null}
+      <div className="mt-0.5 text-xs text-muted">{label}</div>
     </div>
   );
 }

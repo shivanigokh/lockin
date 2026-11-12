@@ -26,18 +26,18 @@ export function MembersList({ groupId, meId, isAdmin, members }: { groupId: stri
   const [remove, removing] = useAction(removeMember);
   const [role, changing] = useAction(setMemberRole);
   return (
-    <ul className="divide-y divide-line">
+    <ul className="divide-y divide-line/60">
       {members.map((m) => {
         const name = displayName(m.profile);
         const isMe = m.user_id === meId;
         return (
-          <li key={m.user_id} className="flex flex-wrap items-center gap-3 py-3">
-            <Avatar name={name} src={m.profile.avatar_url} seed={m.user_id} size={38} />
+          <li key={m.user_id} className="flex items-center gap-3 py-2.5">
+            <Avatar name={name} src={m.profile.avatar_url} seed={m.user_id} size={34} />
             <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2 truncate font-semibold">
-                {name} {isMe ? <span className="text-xs text-muted">(you)</span> : null}
+              <div className="wrap-text text-sm font-semibold">
+                {name} {isMe ? <span className="font-normal text-muted">· you</span> : null}
               </div>
-              <div className="label-mono text-[10px]">
+              <div className="wrap-text text-xs text-muted">
                 @{m.profile.username} · joined {relTime(m.joined_at)}
               </div>
             </div>
@@ -47,7 +47,7 @@ export function MembersList({ groupId, meId, isAdmin, members }: { groupId: stri
               </Badge>
             ) : null}
             {isAdmin && !isMe ? (
-              <div className="flex gap-1">
+              <div className="flex shrink-0 gap-0.5">
                 <Button
                   variant="ghost"
                   size="sm"
