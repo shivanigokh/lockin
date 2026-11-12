@@ -74,7 +74,7 @@ BASE_URL=http://localhost:3000 npm run test:e2e   # browser flows (needs `npx pl
 1. Create a project at <https://supabase.com/dashboard> (any region near your friends).
 2. Apply the migrations. Either:
    - **CLI:** `npx supabase login` → `npx supabase link --project-ref <your-ref>` → `npx supabase db push`, or
-   - **Dashboard:** SQL Editor → run the four files in `supabase/migrations/` in order.
+   - **Dashboard:** SQL Editor → New query → paste all of `supabase/setup.sql` (the four migrations combined) → Run.
 3. **Authentication → URL Configuration**
    - Site URL: `https://<your-vercel-domain>`
    - Redirect URLs: `https://<your-vercel-domain>/**` (and `http://localhost:3000/**` for local dev)
