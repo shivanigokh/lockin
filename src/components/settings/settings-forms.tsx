@@ -73,7 +73,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
           <Input id="p-user" name="username" required pattern="[a-zA-Z0-9_]{3,20}" defaultValue={profile.username} />
         </Field>
         <Field label="Display name" htmlFor="p-name">
-          <Input id="p-name" name="display_name" maxLength={40} defaultValue={profile.display_name ?? ""} placeholder="Riva" />
+          <Input id="p-name" name="display_name" maxLength={40} defaultValue={profile.display_name ?? ""} placeholder="What your squad calls you" />
         </Field>
       </div>
       <Field label="Bio" htmlFor="p-bio" hint="Visible to your squads.">

@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Bell, HeartPulse, LayoutGrid, LogOut, Plus, Target, Trophy } from "lucide-react";
+import { BarChart3, Bell, HeartPulse, LayoutGrid, LogOut, Plus, Target, Trophy } from "lucide-react";
 import { Logo } from "@/components/brand";
 import { Avatar } from "@/components/ui/avatar";
 import { Modal } from "@/components/ui/modal";
@@ -37,6 +37,7 @@ export function Shell({
   groups,
   cookieGroupId,
   unread,
+  isAdmin,
   today,
   defaultVisibility,
   children,
@@ -45,6 +46,7 @@ export function Shell({
   groups: MyGroup[];
   cookieGroupId: string | null;
   unread: number;
+  isAdmin?: boolean;
   today: string;
   defaultVisibility: "groups" | "private";
   children: React.ReactNode;
@@ -96,6 +98,17 @@ export function Shell({
           ))}
         </nav>
         <div className="mt-auto space-y-2">
+          {isAdmin ? (
+            <Link
+              href="/admin"
+              className={cn(
+                "flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition hover:bg-surface-2",
+                pathname === "/admin" ? "text-lime" : "text-muted",
+              )}
+            >
+              <BarChart3 className="h-4 w-4" /> Usage (admin)
+            </Link>
+          ) : null}
           <Link
             href="/notifications"
             className={cn(

@@ -383,3 +383,33 @@ describe("membership management", () => {
     expect(again.data ?? []).toEqual([]);
   });
 });
+
+describe("owner-only usage dashboard", () => {
+  it("regular users (even squad admins) are refused", async () => {
+    expect(ok(await A.c.rpc("is_app_admin"))).toBe(false);
+    const r = await A.c.rpc("admin_usage_stats", { p_today: today });
+    expect(r.error).not.toBeNull();
+    const anon = createClient(URL, ANON, { auth: { persistSession: false } });
+    const r2 = await anon.rpc("admin_usage_stats", { p_today: today });
+    expect(r2.error).not.toBeNull();
+    expect((await A.c.from("app_admins").select("*")).data ?? []).toEqual([]);
+  });
+
+  it("the owner email gets aggregate counts only", async () => {
+    const c = createClient(URL, ANON, { auth: { persistSession: false, autoRefreshToken: false } });
+    const email = "shivani.gokh@gmail.com";
+    const signUp = await c.auth.signUp({ email, password: "password-123456", options: { data: { username: `owner_${run}` } } });
+    if (signUp.error) {
+      // already exists from a previous run
+      const s = await c.auth.signInWithPassword({ email, password: "password-123456" });
+      if (s.error) throw s.error;
+    }
+    expect(ok(await c.rpc("is_app_admin"))).toBe(true);
+    const stats = ok(await c.rpc("admin_usage_stats", { p_today: today })) as Record<string, unknown>;
+    expect(Number(stats.users_total)).toBeGreaterThanOrEqual(4);
+    expect(Number(stats.squads_total)).toBeGreaterThanOrEqual(1);
+    expect((stats.daily as unknown[]).length).toBe(30);
+    const blob = JSON.stringify(stats);
+    for (const s of ["181.5", "88.8", "97.7", "knees", "weight", "height", "@lockin.test", "alice_"]) expect(blob, s).not.toContain(s);
+  });
+});

@@ -25,6 +25,7 @@ Built with Next.js (App Router) · TypeScript · Tailwind CSS v4 · Supabase (Au
 | **Calendar** | Week and month views. Personal (everything incl. private workouts, habit scores, streak, joined challenges) and squad (squad-visible workouts + challenge dates). Colour per activity type. |
 | **Private health** | Height, starting/target weight, weigh-ins with history chart, body measurements (waist, hips, chest, body fat, resting HR, VO₂ max, push-ups, plank), personal notes, health goals text, kg/lb + cm/in. Progress charts: weekly consistency, 30-day habit trend, monthly summary, goal completion. |
 | **Settings** | Profile, habits, privacy (habit sharing, default workout visibility), units, timezone, in-app notification preferences, manage squads, pending invitations, password, delete account |
+| **Usage dashboard** | `/admin`, visible only to the owner email listed in `app_admins` (seeded with the owner's address). Total/new/active users, squads, workouts, habits, goals, challenges and a 30-day chart. Aggregate counts only, enforced in the database. |
 | **Notifications** | In-app: reactions, new challenges, username invites, new squad members, each switchable in settings |
 
 ## Privacy model (enforced in Postgres, not the UI)
@@ -40,7 +41,7 @@ All tables have Row Level Security. See `supabase/migrations/20261112000002_rls.
 7. Logged-out visitors have no table privileges at all.
 8. The app only ever uses the **anon/publishable key**. No service-role key exists anywhere in the code; account deletion runs through a locked-down `delete_my_account()` function.
 
-These rules are covered by `tests/rls.test.ts` (35 tests) which talk to a real Supabase stack as different signed-in users.
+These rules are covered by `tests/rls.test.ts` (37 tests) which talk to a real Supabase stack as different signed-in users.
 
 ## Local development
 
@@ -74,7 +75,7 @@ BASE_URL=http://localhost:3000 npm run test:e2e   # browser flows (needs `npx pl
 1. Create a project at <https://supabase.com/dashboard> (any region near your friends).
 2. Apply the migrations. Either:
    - **CLI:** `npx supabase login` → `npx supabase link --project-ref <your-ref>` → `npx supabase db push`, or
-   - **Dashboard:** SQL Editor → New query → paste all of `supabase/setup.sql` (the four migrations combined) → Run.
+   - **Dashboard:** SQL Editor → New query → paste all of `supabase/setup.sql` (all migrations combined) → Run.
 3. **Authentication → URL Configuration**
    - Site URL: `https://<your-vercel-domain>`
    - Redirect URLs: `https://<your-vercel-domain>/**` (and `http://localhost:3000/**` for local dev)
@@ -124,3 +125,7 @@ tests/
 ---
 
 *Your body is not a leaderboard. Hydrated? Emotionally? Physically? Unclear.*
+
+## Adding another admin
+
+In the Supabase SQL editor: `insert into public.app_admins (email) values ('someone@example.com');` The account must exist with a confirmed email.

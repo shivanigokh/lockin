@@ -49,6 +49,20 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"app_admins": {
+                  Row: {
+                    "created_at": string,"email": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"email": string
+                  }
+                  Update: {
+                    "created_at"?: string,"email"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"body_measurements": {
                   Row: {
                     "body_fat_pct": number | null,"chest_cm": number | null,"created_at": string,"hips_cm": number | null,"id": string,"measured_on": string,"note": string | null,"plank_seconds": number | null,"pushups_max": number | null,"resting_hr": number | null,"user_id": string,"vo2max": number | null,"waist_cm": number | null
@@ -495,7 +509,10 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "can_invite":
+            "admin_usage_stats":
+{ Args: { "p_today": string }; Returns: Json
+                           },
+"can_invite":
 { Args: { "p_group": string }; Returns: boolean
                            },
 "can_view_goal":
@@ -551,6 +568,9 @@ isOneToOne: false
                            },
 "invite_user":
 { Args: { "p_group": string,"p_username": string }; Returns: undefined
+                           },
+"is_app_admin":
+{ Args: Record<PropertyKey, never>; Returns: boolean
                            },
 "is_group_admin":
 { Args: { "p_group": string }; Returns: boolean
