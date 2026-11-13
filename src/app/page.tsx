@@ -35,9 +35,9 @@ export default async function Landing({ searchParams }: { searchParams: Promise<
 
       <section className="mx-auto max-w-6xl px-5 pb-16 pt-12 sm:pt-20">
         <div className="relative">
-          <div className="pointer-events-none relative mb-6 h-24 w-28 sm:absolute sm:-top-10 sm:right-10 sm:mb-0 sm:h-72 sm:w-72" aria-hidden>
-            <span className="absolute left-[8%] top-[30%] h-[58%] w-[58%] rounded-full bg-[radial-gradient(circle_at_35%_30%,#fff,#d9daff_40%,#7579e0)] shadow-[0_0_80px_10px_rgba(117,121,224,0.55)] blur-[2px]" />
-            <span className="absolute right-[6%] top-[8%] h-[40%] w-[40%] rounded-full bg-[radial-gradient(circle_at_35%_30%,#fff,#ffd2cb_40%,#e94b3c)] shadow-[0_0_70px_6px_rgba(233,75,60,0.5)] blur-[2px]" />
+          <div className="pointer-events-none relative mb-6 hidden h-24 w-28 sm:absolute sm:block sm:-top-10 sm:right-10 sm:mb-0 sm:h-72 sm:w-72" aria-hidden>
+            <span className="absolute left-[8%] top-[30%] h-[58%] w-[58%] rounded-full bg-[radial-gradient(circle_at_35%_30%,#fff,#d9daff_40%,#7579e0)] shadow-[0_0_80px_10px_rgba(117,121,224,0.55)]" />
+            <span className="absolute right-[6%] top-[8%] h-[40%] w-[40%] rounded-full bg-[radial-gradient(circle_at_35%_30%,#fff,#ffd2cb_40%,#e94b3c)] shadow-[0_0_70px_6px_rgba(233,75,60,0.5)]" />
           </div>
           <p className="relative mb-4 text-[15px] font-medium text-lavender">A tiny accountability club for you and your friends</p>
           <h1 className="display relative max-w-3xl text-[clamp(3rem,12vw,7.5rem)]">

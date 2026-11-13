@@ -3,40 +3,19 @@ import { COPY } from "@/lib/constants";
 
 export const APP_NAME = "nudge";
 
-/** Two soft orbs: a small tomato one nudging a bigger blueberry one into motion. */
+/** A lowercase "n" arch getting a push from a tomato dot, on a blueberry tile. */
 export function NudgeMark({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 64 64" className={cn("h-7 w-7", className)} aria-hidden>
       <defs>
-        <radialGradient id="nm-b" cx="38%" cy="30%" r="75%">
-          <stop offset="0" stopColor="#fff" />
-          <stop offset=".45" stopColor="#d9daff" />
-          <stop offset="1" stopColor="#7579e0" />
-        </radialGradient>
-        <radialGradient id="nm-t" cx="38%" cy="30%" r="75%">
-          <stop offset="0" stopColor="#fff" />
-          <stop offset=".45" stopColor="#ffd2cb" />
-          <stop offset="1" stopColor="#e94b3c" />
-        </radialGradient>
-        <filter id="nm-glow" x="-60%" y="-60%" width="220%" height="220%">
-          <feGaussianBlur stdDeviation="5" />
-        </filter>
-        <filter id="nm-soft" x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="1.6" result="b" />
-          <feMerge>
-            <feMergeNode in="b" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
+        <linearGradient id="nm-bg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#8d90f0" />
+          <stop offset="1" stopColor="#6064d4" />
+        </linearGradient>
       </defs>
-      <g filter="url(#nm-glow)" opacity=".85">
-        <circle cx="25" cy="36" r="15" fill="#7579e0" />
-        <circle cx="45" cy="27" r="11" fill="#e94b3c" />
-      </g>
-      <g filter="url(#nm-soft)">
-        <circle cx="25" cy="36" r="14" fill="url(#nm-b)" />
-        <circle cx="45" cy="26" r="10" fill="url(#nm-t)" />
-      </g>
+      <rect width="64" height="64" rx="16" fill="url(#nm-bg)" />
+      <path d="M18 48V30a14 14 0 0 1 28 0v18" fill="none" stroke="#fff" strokeWidth="9" strokeLinecap="round" />
+      <circle cx="51" cy="20" r="6.5" fill="#ff5a45" />
     </svg>
   );
 }
