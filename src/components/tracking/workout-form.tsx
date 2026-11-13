@@ -149,7 +149,7 @@ export function WorkoutForm({
         ))}
       </div>
       <p className="-mt-2 text-xs text-muted">
-        {visibility === "groups" ? "Counts on your squads' leaderboards." : "Hidden from everyone. Still counts for your own goals."}
+        {visibility === "groups" ? "Shows in every squad you're in and to your friends." : "Hidden from everyone. Still counts for your own goals."}
       </p>
 
       {more ? (

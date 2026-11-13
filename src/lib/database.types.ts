@@ -129,6 +129,32 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"friendships": {
+                  Row: {
+                    "addressee_id": string,"created_at": string,"id": string,"requester_id": string,"responded_at": string | null,"status": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "addressee_id": string,"created_at"?: string,"id"?: string,"requester_id": string,"responded_at"?: string | null,"status"?: string
+                  }
+                  Update: {
+                    "addressee_id"?: string,"created_at"?: string,"id"?: string,"requester_id"?: string,"responded_at"?: string | null,"status"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "friendships_addressee_id_fkey"
+      columns: ["addressee_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "friendships_requester_id_fkey"
+      columns: ["requester_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"goal_progress_entries": {
                   Row: {
                     "amount": number,"created_at": string,"goal_id": string,"id": string,"logged_on": string,"note": string | null,"user_id": string
@@ -517,6 +543,9 @@ isOneToOne: false
 "admin_usage_stats":
 { Args: { "p_today": string }; Returns: Json
                            },
+"can_follow":
+{ Args: { "p_user": string }; Returns: boolean
+                           },
 "can_invite":
 { Args: { "p_group": string }; Returns: boolean
                            },
@@ -577,6 +606,9 @@ isOneToOne: false
 "is_app_admin":
 { Args: Record<PropertyKey, never>; Returns: boolean
                            },
+"is_friend":
+{ Args: { "p_user": string }; Returns: boolean
+                           },
 "is_group_admin":
 { Args: { "p_group": string }; Returns: boolean
                            },
@@ -591,6 +623,16 @@ isOneToOne: false
                            },
 "metric_value":
 { Args: { "p_activity": Database["public"]['Enums']["activity_type"],"p_from": string,"p_groups_only": boolean,"p_habit_key": string,"p_to": string,"p_tracking": string,"p_user": string }; Returns: number
+                           },
+"my_friend_requests":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "avatar_url": string,"created_at": string,"direction": string,"display_name": string,"id": string,"user_id": string,"username": string
+            }[]
+                           },
+"my_friends":
+{ Args: { "p_today": string }; Returns: {
+              "avatar_url": string,"display_name": string,"habits_done": number,"habits_total": number,"last_workout": string,"minutes_7d": number,"since": string,"user_id": string,"username": string,"workouts_7d": number
+            }[]
                            },
 "my_goals":
 { Args: { "p_today": string }; Returns: {
@@ -615,14 +657,23 @@ isOneToOne: false
               "already_member": boolean,"color": string,"description": string,"group_id": string,"icon": string,"member_count": number,"name": string,"reason": string,"valid": boolean
             }[]
                            },
+"remove_friend":
+{ Args: { "p_user": string }; Returns: undefined
+                           },
 "remove_member":
 { Args: { "p_group": string,"p_user": string }; Returns: undefined
+                           },
+"respond_friend_request":
+{ Args: { "p_accept": boolean,"p_id": string }; Returns: undefined
                            },
 "respond_to_invite":
 { Args: { "p_accept": boolean,"p_invite": string }; Returns: string
                            },
 "revoke_invite":
 { Args: { "p_invite": string }; Returns: undefined
+                           },
+"send_friend_request":
+{ Args: { "p_username": string }; Returns: Json
                            },
 "shares_group_with":
 { Args: { "p_user": string }; Returns: boolean

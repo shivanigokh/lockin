@@ -69,19 +69,19 @@ export function WeightForm({ today, wu }: { today: string; wu: WeightUnit }) {
   const [add, pending] = useAction(addWeight, { onSuccess: () => setW("") });
   return (
     <form
-      className="flex flex-wrap items-end gap-2"
+      className="grid grid-cols-2 items-end gap-3 sm:flex sm:flex-wrap"
       onSubmit={(e) => {
         e.preventDefault();
         add({ entry_date: date, weight_kg: round1(toKg(Number(w), wu)) });
       }}
     >
-      <Field label="Date" htmlFor="wf-d">
+      <Field label="Date" htmlFor="wf-d" className="min-w-0 sm:w-44">
         <Input id="wf-d" type="date" max={today} required value={date} onChange={(e) => setDate(e.target.value)} />
       </Field>
-      <Field label={`Weight (${wu})`} htmlFor="wf-w" className="w-32">
-        <Input id="wf-w" type="number" step="0.1" inputMode="decimal" required value={w} onChange={(e) => setW(e.target.value)} />
+      <Field label={`Weight (${wu})`} htmlFor="wf-w" className="min-w-0 sm:w-32">
+        <Input id="wf-w" type="number" step="0.1" inputMode="decimal" placeholder="e.g. 62.5" required value={w} onChange={(e) => setW(e.target.value)} />
       </Field>
-      <Button type="submit" loading={pending}>
+      <Button type="submit" loading={pending} className="col-span-2 sm:col-span-1">
         Log weigh-in
       </Button>
     </form>

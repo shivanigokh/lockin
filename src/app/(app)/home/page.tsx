@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { KeyRound, Plus } from "lucide-react";
+import { KeyRound, Plus, UsersRound } from "lucide-react";
 import { getActiveGroupId, getMe, getMyGroups } from "@/lib/data";
 import { createClient } from "@/lib/supabase/server";
 import { Page } from "@/components/page-header";
@@ -40,6 +40,13 @@ export default async function HomePage() {
           <KeyRound className="mb-8 h-8 w-8 text-pink transition group-hover:animate-wiggle" />
           <h2 className="font-display text-2xl font-semibold tracking-tight">Join with a code</h2>
           <p className="mt-2 text-sm text-muted">A friend sent you a code or link? Get in.</p>
+        </Link>
+        <Link href="/friends" className="card group flex items-center gap-4 p-5 transition hover:-translate-y-0.5 sm:col-span-2">
+          <UsersRound className="h-7 w-7 shrink-0 text-lavender" />
+          <span className="min-w-0 flex-1">
+            <span className="block font-semibold">Just one friend?</span>
+            <span className="block text-sm text-muted">Add them as a friend instead. No squad needed.</span>
+          </span>
         </Link>
       </div>
       {groups.length ? (

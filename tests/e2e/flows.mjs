@@ -253,6 +253,28 @@ await step("screenshots", async () => {
   await mpage.screenshot({ path: `${SHOTS}dashboard-mobile.png`, fullPage: true });
 });
 
+await step("friends: add by username, accept, see stats", async () => {
+  await p1.goto(`${BASE}/friends`);
+  await p1.fill("input[aria-label=\"Friend's username\"]", `sam_${run}`);
+  await p1.getByRole("button", { name: "Add" }).click();
+  await p1.getByText(`Request sent to @sam_${run}.`).waitFor();
+  await sam.page.goto(`${BASE}/friends`);
+  await sam.page.getByRole("button", { name: "Accept" }).click();
+  await sam.page.getByText(/Your friends \(1\)/).waitFor();
+  await p1.goto(`${BASE}/friends`);
+  await p1.getByText(/Your friends \(1\)/).waitFor();
+  await p1.getByRole("link", { name: new RegExp(`sam_${run}`) }).click();
+  await p1.getByText("Last 30 days").waitFor();
+  // sam views riva's page: riva logged a 87.4 kg weigh-in earlier, which must never show
+  await sam.page.goto(`${BASE}/friends`);
+  await sam.page.getByRole("link", { name: new RegExp(`riva_${run}`) }).click();
+  await sam.page.getByText("Last 30 days").waitFor();
+  const text = await sam.page.innerText("body");
+  const html = await sam.page.content();
+  if (text.includes("87.4")) throw new Error("weight leaked to friend page");
+  for (const s of ["weight_kg", "waist_cm", "height_cm"]) if (html.includes(s)) throw new Error("health field leaked: " + s);
+});
+
 await step("admin removes a member, member loses access", async () => {
   await p1.goto(`${groupUrl}/squad`);
   p1.once("dialog", (d) => d.accept());

@@ -420,3 +420,82 @@ describe("owner-only usage dashboard", () => {
     for (const s of ["181.5", "88.8", "knees", "weight", "@lockin.test", "Secret plan", "couch creature no more"]) expect(squadBlob, s).not.toContain(s);
   });
 });
+
+describe("friends (outside squads)", () => {
+  let P: U, Q: U, R: U; // P and Q become friends; R is a stranger
+  beforeAll(async () => {
+    [P, Q, R] = await Promise.all(["pia", "quinn", "rex"].map(makeUser));
+    ok(await P.c.from("private_health_profiles").update({ height_cm: 166.6 }).eq("user_id", P.id));
+    ok(await P.c.from("weight_entries").insert({ user_id: P.id, entry_date: today, weight_kg: 71.7 }));
+    ok(await P.c.from("workouts").insert({ user_id: P.id, activity_type: "running", performed_on: today, duration_min: 33, visibility: "groups" }));
+    ok(await P.c.from("workouts").insert({ user_id: P.id, activity_type: "yoga", performed_on: today, duration_min: 44, visibility: "private" }));
+    ok(await P.c.from("personal_goals").insert({ user_id: P.id, title: "Private sauna plan", target_value: 3 }));
+  });
+
+  it("strangers can't see each other before a request is accepted", async () => {
+    expect(ok(await Q.c.from("workouts").select("id").eq("user_id", P.id))).toEqual([]);
+    expect(ok(await Q.c.from("profiles").select("id").eq("id", P.id))).toEqual([]);
+    expect((ok(await P.c.rpc("send_friend_request", { p_username: Q.username })) as { status: string }).status).toBe("sent");
+    expect(ok(await Q.c.from("workouts").select("id").eq("user_id", P.id))).toEqual([]);
+  });
+
+  it("nobody can insert or accept a friendship directly", async () => {
+    const ins = await R.c.from("friendships").insert({ requester_id: R.id, addressee_id: P.id, status: "accepted" });
+    expect(ins.error).not.toBeNull();
+    const reqs = ok(await Q.c.rpc("my_friend_requests")) as { id: string; direction: string }[];
+    const upd = await P.c.from("friendships").update({ status: "accepted" }).eq("id", reqs[0].id);
+    expect(upd.error).not.toBeNull();
+    // only the addressee can accept
+    expect((await P.c.rpc("respond_friend_request", { p_id: reqs[0].id, p_accept: true })).error).not.toBeNull();
+    expect(reqs[0].direction).toBe("incoming");
+    ok(await Q.c.rpc("respond_friend_request", { p_id: reqs[0].id, p_accept: true }));
+  });
+
+  it("friends see shared workouts and stats, never private workouts", async () => {
+    const ws = ok(await Q.c.from("workouts").select("duration_min").eq("user_id", P.id)) as { duration_min: number }[];
+    expect(ws.map((w) => w.duration_min)).toEqual([33]);
+    const fr = ok(await Q.c.rpc("my_friends", { p_today: today })) as { user_id: string; workouts_7d: number; minutes_7d: number }[];
+    expect(fr).toHaveLength(1);
+    expect(fr[0]).toMatchObject({ user_id: P.id, workouts_7d: 1, minutes_7d: 33 });
+  });
+
+  it("friends never see health data or private goals", async () => {
+    expect(ok(await Q.c.from("private_health_profiles").select("*").eq("user_id", P.id))).toEqual([]);
+    expect(ok(await Q.c.from("weight_entries").select("*").eq("user_id", P.id))).toEqual([]);
+    expect(ok(await Q.c.from("personal_goals").select("*").eq("user_id", P.id))).toEqual([]);
+    const blob = JSON.stringify(ok(await Q.c.rpc("my_friends", { p_today: today })));
+    for (const s of ["166.6", "71.7", "sauna", "@lockin.test"]) expect(blob).not.toContain(s);
+  });
+
+  it("strangers still see nothing, and unfriending cuts access", async () => {
+    expect(ok(await R.c.from("workouts").select("id").eq("user_id", P.id))).toEqual([]);
+    expect(ok(await R.c.rpc("my_friends", { p_today: today }))).toEqual([]);
+    ok(await Q.c.rpc("remove_friend", { p_user: P.id }));
+    expect(ok(await Q.c.from("workouts").select("id").eq("user_id", P.id))).toEqual([]);
+  });
+});
+
+describe("one log, every squad", () => {
+  it("a workout and a habit tick logged once show up in all of a user's squads", async () => {
+    const [X, Y, Z] = await Promise.all(["xena", "yuri", "zoe"].map(makeUser));
+    const g1 = ok(await X.c.rpc("create_group", { p_name: `Alpha ${run}` })) as string;
+    const g2 = ok(await X.c.rpc("create_group", { p_name: `Beta ${run}` })) as string;
+    const c1 = (ok(await X.c.from("group_invites").select("code").eq("group_id", g1)) as { code: string }[])[0].code;
+    const c2 = (ok(await X.c.from("group_invites").select("code").eq("group_id", g2)) as { code: string }[])[0].code;
+    ok(await Y.c.rpc("join_group_with_code", { p_code: c1 }));
+    ok(await Z.c.rpc("join_group_with_code", { p_code: c2 }));
+
+    ok(await X.c.from("workouts").insert({ user_id: X.id, activity_type: "swimming", performed_on: today, duration_min: 25 }));
+    const habit = (ok(await X.c.from("daily_habits").select("id").eq("user_id", X.id).limit(1)) as { id: string }[])[0];
+    ok(await X.c.from("habit_completions").insert({ habit_id: habit.id, user_id: X.id, completed_on: today }));
+
+    for (const [viewer, g] of [[Y, g1], [Z, g2]] as const) {
+      const lb = ok(await viewer.c.rpc("group_leaderboard", { p_group: g, p_period: "week", p_today: today })) as { user_id: string; workouts: number }[];
+      expect(lb.find((r) => r.user_id === X.id)?.workouts).toBe(1);
+      const ht = ok(await viewer.c.rpc("group_habits_today", { p_group: g, p_today: today })) as { user_id: string; done: number }[];
+      expect(ht.find((r) => r.user_id === X.id)?.done).toBe(1);
+      const feed = ok(await viewer.c.from("group_activity").select("kind").eq("group_id", g).eq("actor_id", X.id).eq("kind", "workout")) as unknown[];
+      expect(feed).toHaveLength(1);
+    }
+  });
+});

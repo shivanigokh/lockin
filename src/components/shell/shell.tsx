@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { BarChart3, Bell, HeartPulse, LayoutGrid, LogOut, Plus, Target, Trophy } from "lucide-react";
+import { BarChart3, Bell, HeartPulse, LayoutGrid, LogOut, Plus, Target, UsersRound } from "lucide-react";
 import { Logo } from "@/components/brand";
 import { Avatar } from "@/components/ui/avatar";
 import { Modal } from "@/components/ui/modal";
@@ -63,7 +63,7 @@ export function Shell({
 
   const bottom: NavItem[] = [
     { href: activeId ? `/g/${activeId}` : "/home", label: "Squad", icon: LayoutGrid, exact: true },
-    { href: activeId ? `/g/${activeId}/leaderboard` : "/home#board", label: "Board", icon: Trophy },
+    { href: "/friends", label: "Friends", icon: UsersRound },
     { href: "/goals", label: "Goals", icon: Target },
     { href: "/me", label: "Me", icon: HeartPulse },
   ];

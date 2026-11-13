@@ -10,8 +10,8 @@ export function SquadTabs({ groupId }: { groupId: string }) {
   return (
     <nav data-scroll-x className="scrollbar-none flex gap-1.5 overflow-x-auto px-4 pt-3 md:hidden">
       {squadNav(groupId)
-        // Leaderboard lives in the tab bar and the calendar on the Today screen, so keep this row short.
-        .filter((i) => !i.href.endsWith("/leaderboard") && !i.href.endsWith("/calendar"))
+        // The calendar lives on the Today screen, so keep this row short.
+        .filter((i) => !i.href.endsWith("/calendar"))
         .map((i) => {
         const active = isActive(pathname, i);
         return (
