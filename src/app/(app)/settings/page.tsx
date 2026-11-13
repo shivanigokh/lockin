@@ -32,10 +32,10 @@ export default async function SettingsPage() {
 
   return (
     <Page className="max-w-3xl">
-      <PageHeader label="// control panel" title="Settings" />
+      <PageHeader label="control panel" title="Settings" />
       <nav className="scrollbar-none -mx-4 mb-6 flex gap-1.5 overflow-x-auto px-4">
         {SECTIONS.map(([id, label]) => (
-          <a key={id} href={`#${id}`} className="whitespace-nowrap rounded-full border border-line px-3 py-1 font-mono text-[11px] uppercase text-muted transition hover:border-lime hover:text-lime">
+          <a key={id} href={`#${id}`} className="whitespace-nowrap rounded-full border border-line px-3.5 py-1.5 text-[13px] font-medium capitalize text-muted transition hover:border-lime hover:text-lime">
             {label}
           </a>
         ))}

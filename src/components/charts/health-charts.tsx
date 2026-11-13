@@ -20,8 +20,8 @@ export function WeightChart({ data, target, unit }: { data: { date: string; valu
           <XAxis dataKey="date" tickFormatter={short} {...axis} minTickGap={24} />
           <YAxis domain={[min, max]} {...axis} width={44} />
           <Tooltip {...chartTooltip} labelFormatter={(l) => short(String(l))} formatter={(v) => [`${v} ${unit}`, "weight"]} />
-          {target ? <ReferenceLine y={target} stroke="#ff6ec7" strokeDasharray="6 4" label={{ value: "target", fill: "#ff6ec7", fontSize: 11, position: "insideTopRight" }} /> : null}
-          <Line type="monotone" dataKey="value" stroke="#c8ff2e" strokeWidth={2.5} dot={{ r: 3, fill: "#c8ff2e" }} activeDot={{ r: 5 }} />
+          {target ? <ReferenceLine y={target} stroke="#ff6b57" strokeDasharray="6 4" label={{ value: "target", fill: "#ff6b57", fontSize: 11, position: "insideTopRight" }} /> : null}
+          <Line type="monotone" dataKey="value" stroke="#979aff" strokeWidth={2.5} dot={{ r: 3, fill: "#979aff" }} activeDot={{ r: 5 }} />
         </LineChart>
       </ResponsiveContainer>
     </div>
@@ -37,7 +37,7 @@ export function WeeklyWorkoutsChart({ data }: { data: { week: string; workouts: 
           <XAxis dataKey="week" tickFormatter={short} {...axis} minTickGap={16} />
           <YAxis allowDecimals={false} {...axis} />
           <Tooltip {...chartTooltip} labelFormatter={(l) => `Week of ${short(String(l))}`} formatter={(v, n) => [v, n === "workouts" ? "workouts" : "minutes"]} />
-          <Bar dataKey="workouts" fill="#c8ff2e" radius={[6, 6, 0, 0]} />
+          <Bar dataKey="workouts" fill="#979aff" radius={[6, 6, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>
@@ -51,15 +51,15 @@ export function HabitTrendChart({ data }: { data: { date: string; pct: number }[
         <AreaChart data={data} margin={{ left: -20, right: 4, top: 8, bottom: 0 }}>
           <defs>
             <linearGradient id="habitFill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#b8a6ff" stopOpacity={0.35} />
-              <stop offset="100%" stopColor="#b8a6ff" stopOpacity={0} />
+              <stop offset="0%" stopColor="#c6c7ff" stopOpacity={0.35} />
+              <stop offset="100%" stopColor="#c6c7ff" stopOpacity={0} />
             </linearGradient>
           </defs>
           <CartesianGrid stroke="#2c2c31" strokeDasharray="3 3" vertical={false} />
           <XAxis dataKey="date" tickFormatter={short} {...axis} minTickGap={24} />
           <YAxis domain={[0, 100]} {...axis} tickFormatter={(v) => `${v}%`} />
           <Tooltip {...chartTooltip} labelFormatter={(l) => short(String(l))} formatter={(v) => [`${v}%`, "habits done"]} />
-          <Area type="monotone" dataKey="pct" stroke="#b8a6ff" strokeWidth={2} fill="url(#habitFill)" />
+          <Area type="monotone" dataKey="pct" stroke="#c6c7ff" strokeWidth={2} fill="url(#habitFill)" />
         </AreaChart>
       </ResponsiveContainer>
     </div>

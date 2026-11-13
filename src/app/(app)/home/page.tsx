@@ -20,7 +20,7 @@ export default async function HomePage() {
 
   return (
     <Page className="max-w-3xl">
-      <p className="label-mono mb-3 text-lime">// hi {displayName(me.profile)}</p>
+      <p className="label-mono mb-3 text-lime">hi {displayName(me.profile)}</p>
       <h1 className="display text-5xl sm:text-7xl">{groups.length ? "You've got mail." : "You're squadless."}</h1>
       <p className="mt-4 max-w-lg text-muted">
         {groups.length
@@ -33,12 +33,12 @@ export default async function HomePage() {
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         <Link href="/squads/new" className="card group p-6 transition hover:-translate-y-0.5 hover:border-lime">
           <Plus className="mb-8 h-8 w-8 text-lime transition group-hover:rotate-90" />
-          <h2 className="font-display text-2xl font-black uppercase">Start a squad</h2>
+          <h2 className="font-display text-2xl font-semibold tracking-tight">Start a squad</h2>
           <p className="mt-2 text-sm text-muted">You&apos;re the admin. Get 3 people in and it unlocks.</p>
         </Link>
         <Link href="/squads/join" className="card group p-6 transition hover:-translate-y-0.5 hover:border-pink">
           <KeyRound className="mb-8 h-8 w-8 text-pink transition group-hover:animate-wiggle" />
-          <h2 className="font-display text-2xl font-black uppercase">Join with a code</h2>
+          <h2 className="font-display text-2xl font-semibold tracking-tight">Join with a code</h2>
           <p className="mt-2 text-sm text-muted">A friend sent you a code or link? Get in.</p>
         </Link>
       </div>

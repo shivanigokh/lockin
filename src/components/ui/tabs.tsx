@@ -17,7 +17,7 @@ export function SegmentLinks({
   const sp = useSearchParams();
   const current = sp.get(param) ?? defaultValue;
   return (
-    <div data-scroll-x className="inline-flex max-w-full overflow-x-auto rounded-xl bg-surface p-1 scrollbar-none sm:border sm:border-line">
+    <div data-scroll-x className="glass inline-flex max-w-full overflow-x-auto rounded-full p-1 scrollbar-none">
       {options.map((o) => {
         const next = new URLSearchParams(sp.toString());
         next.set(param, o.value);
@@ -27,8 +27,8 @@ export function SegmentLinks({
             href={`${pathname}?${next.toString()}`}
             scroll={false}
             className={cn(
-              "whitespace-nowrap rounded-lg px-3 py-1.5 text-[13px] font-semibold transition",
-              current === o.value ? "bg-lime text-black" : "text-muted hover:text-ink",
+              "whitespace-nowrap rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition",
+              current === o.value ? "bg-white/[0.14] text-ink shadow-sm" : "text-muted hover:text-ink",
             )}
           >
             {o.label}
@@ -49,15 +49,15 @@ export function Segment<T extends string>({
   options: { value: T; label: string }[];
 }) {
   return (
-    <div className="inline-flex max-w-full flex-wrap rounded-xl bg-surface p-1 sm:border sm:border-line">
+    <div className="glass inline-flex max-w-full flex-wrap rounded-full p-1">
       {options.map((o) => (
         <button
           type="button"
           key={o.value}
           onClick={() => onChange(o.value)}
           className={cn(
-            "whitespace-nowrap rounded-lg px-3 py-1.5 text-[13px] font-semibold transition cursor-pointer",
-            value === o.value ? "bg-lime text-black" : "text-muted hover:text-ink",
+            "whitespace-nowrap rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition cursor-pointer",
+            value === o.value ? "bg-white/[0.14] text-ink shadow-sm" : "text-muted hover:text-ink",
           )}
         >
           {o.label}

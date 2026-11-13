@@ -22,11 +22,11 @@ function NavLink({ item, pathname, onClick }: { item: NavItem; pathname: string;
       href={item.href}
       onClick={onClick}
       className={cn(
-        "group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition",
-        active ? "bg-lime text-black" : "text-muted hover:bg-surface-2 hover:text-ink",
+        "group flex items-center gap-3 rounded-full px-3.5 py-2 text-sm font-medium transition",
+        active ? "bg-white/[0.12] text-ink" : "text-muted hover:bg-white/[0.06] hover:text-ink",
       )}
     >
-      <item.icon className={cn("h-4 w-4", !active && "group-hover:text-lime")} />
+      <item.icon className={cn("h-4 w-4", active ? "text-lime" : "group-hover:text-lime")} />
       {item.label}
     </Link>
   );
@@ -71,7 +71,7 @@ export function Shell({
   return (
     <div className="min-h-dvh md:grid md:grid-cols-[260px_1fr]">
       {/* desktop sidebar */}
-      <aside className="sticky top-0 hidden h-dvh flex-col gap-5 overflow-y-auto border-r border-line bg-surface/60 p-4 md:flex">
+      <aside className="glass sticky top-0 hidden h-dvh flex-col gap-5 overflow-y-auto rounded-none border-y-0 border-l-0 p-4 md:flex">
         <Link href="/home" className="group px-2 pt-1">
           <Logo />
         </Link>
@@ -79,7 +79,7 @@ export function Shell({
         <button
           type="button"
           onClick={() => setLogOpen(true)}
-          className="flex items-center justify-center gap-2 rounded-2xl bg-lime py-3 font-bold text-black transition hover:shadow-[0_0_24px_-6px_rgba(200,255,46,0.7)] cursor-pointer"
+          className="flex items-center justify-center gap-2 rounded-full bg-gradient-to-b from-[#a9abff] to-[#8689f5] py-3 font-semibold text-[#141218] shadow-[0_8px_24px_-10px_rgba(117,121,224,0.9),inset_0_1px_0_rgba(255,255,255,0.45)] transition hover:brightness-105 cursor-pointer"
         >
           <Plus className="h-5 w-5" /> Log workout
         </button>
@@ -102,7 +102,7 @@ export function Shell({
             <Link
               href="/admin"
               className={cn(
-                "flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition hover:bg-surface-2",
+                "flex items-center gap-3 rounded-full px-3.5 py-2 text-sm transition hover:bg-white/[0.06]",
                 pathname === "/admin" ? "text-lime" : "text-muted",
               )}
             >
@@ -112,14 +112,14 @@ export function Shell({
           <Link
             href="/notifications"
             className={cn(
-              "flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition hover:bg-surface-2",
+              "flex items-center gap-3 rounded-full px-3.5 py-2 text-sm transition hover:bg-white/[0.06]",
               pathname === "/notifications" ? "text-ink" : "text-muted",
             )}
           >
             <Bell className="h-4 w-4" /> Notifications
-            {unread > 0 ? <span className="ml-auto rounded-full bg-pink px-2 font-mono text-[10px] font-bold text-black">{unread}</span> : null}
+            {unread > 0 ? <span className="ml-auto rounded-full bg-pink px-2 text-[11px] font-semibold text-white">{unread}</span> : null}
           </Link>
-          <div className="flex items-center gap-3 rounded-2xl border border-line p-2">
+          <div className="flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.04] p-1.5 pr-2">
             <Avatar name={name} src={me.avatar_url} seed={me.id} size={34} />
             <div className="min-w-0 flex-1">
               <div className="truncate text-sm font-semibold">{name}</div>
@@ -131,15 +131,12 @@ export function Shell({
               </button>
             </form>
           </div>
-          <p className="label-mono px-2 text-[9px] text-faint">{COPY.hydrated}</p>
+          <p className="px-2 text-[11px] text-faint">{COPY.hydrated}</p>
         </div>
       </aside>
 
       {/* mobile top bar */}
-      <header className="sticky top-0 z-40 flex items-center gap-1.5 bg-bg/90 px-3 py-2 backdrop-blur md:hidden">
-        <Link href="/home" aria-label="Home" className="group">
-          <Logo compact />
-        </Link>
+      <header className="sticky top-0 z-40 flex items-center gap-1.5 border-b border-white/[0.06] bg-bg/60 px-3 pb-2 pt-[max(0.5rem,env(safe-area-inset-top))] backdrop-blur-2xl backdrop-saturate-150 md:hidden">
         <SquadSwitcher groups={groups} activeId={activeId} className="min-w-0 flex-1" compact />
         <Link href="/notifications" className="relative rounded-xl p-2 text-muted" aria-label="Notifications">
           <Bell className="h-5 w-5" />
@@ -150,11 +147,11 @@ export function Shell({
         </Link>
       </header>
 
-      <main className="min-w-0 pb-24 md:pb-12">{children}</main>
+      <main className="min-w-0 pb-32 md:pb-12">{children}</main>
 
-      {/* mobile bottom nav */}
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line/60 bg-bg/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
-        <div className="mx-auto grid max-w-md grid-cols-5 items-center px-2 py-1.5">
+      {/* mobile tab bar: floating glass pill, big thumb-zone log button in the middle */}
+      <nav className="fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:hidden">
+        <div className="mx-auto grid max-w-md grid-cols-5 items-center rounded-full border border-white/10 bg-[#1d1a22]/80 px-1.5 py-1.5 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-2xl backdrop-saturate-150">
           {bottom.slice(0, 2).map((i) => (
             <BottomLink key={i.label} item={i} pathname={pathname} />
           ))}
@@ -163,9 +160,10 @@ export function Shell({
               type="button"
               onClick={() => setLogOpen(true)}
               aria-label="Log workout"
-              className="-mt-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-lime text-black shadow-[0_8px_30px_-8px_rgba(200,255,46,0.8)] transition active:scale-95 cursor-pointer"
+              className="relative flex h-14 w-14 items-center justify-center rounded-full text-[#141218] transition active:scale-95 cursor-pointer"
             >
-              <Plus className="h-7 w-7" strokeWidth={2.5} />
+              <span className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_35%_30%,#ffffff,#d9daff_40%,#7579e0)] shadow-[0_0_28px_-2px_rgba(117,121,224,0.85)]" aria-hidden />
+              <Plus className="relative h-6 w-6" strokeWidth={2.5} />
             </button>
           </div>
           {bottom.slice(2).map((i) => (
@@ -174,7 +172,7 @@ export function Shell({
         </div>
       </nav>
 
-      <Modal open={logOpen} onClose={() => setLogOpen(false)} title="Log a workout" label="// receipts or it didn't happen">
+      <Modal open={logOpen} onClose={() => setLogOpen(false)} title="Log a workout" label="receipts or it didn't happen">
         <WorkoutForm today={today} defaultVisibility={defaultVisibility} onDone={() => setLogOpen(false)} />
       </Modal>
     </div>
@@ -184,8 +182,14 @@ export function Shell({
 function BottomLink({ item, pathname }: { item: NavItem; pathname: string }) {
   const active = isActive(pathname, item);
   return (
-    <Link href={item.href} className={cn("flex flex-col items-center gap-0.5 py-1.5 text-[10px] font-semibold", active ? "text-lime" : "text-muted")}>
-      <item.icon className="h-5 w-5" />
+    <Link
+      href={item.href}
+      className={cn(
+        "flex flex-col items-center gap-0.5 rounded-full py-1.5 text-[10px] font-semibold transition",
+        active ? "bg-white/[0.1] text-ink" : "text-muted",
+      )}
+    >
+      <item.icon className={cn("h-[22px] w-[22px]", active && "text-lime")} />
       {item.label}
     </Link>
   );

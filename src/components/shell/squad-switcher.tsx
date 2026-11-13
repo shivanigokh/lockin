@@ -10,7 +10,7 @@ export function SquadBadge({ g, size = 32 }: { g: Pick<MyGroup, "icon" | "color"
   const Icon = squadIcon(g.icon);
   return (
     <span
-      className="inline-flex shrink-0 items-center justify-center rounded-xl text-black"
+      className="inline-flex shrink-0 items-center justify-center rounded-[30%] text-[#141218]"
       style={{ width: size, height: size, background: colorVar(g.color) }}
     >
       <Icon style={{ width: size * 0.55, height: size * 0.55 }} />
@@ -46,7 +46,7 @@ export function SquadSwitcher({ groups, activeId, className, compact }: { groups
         aria-haspopup="listbox"
         className={cn(
           "flex w-full items-center text-left transition cursor-pointer",
-          compact ? "gap-2 rounded-xl p-1 pr-2 active:bg-surface-2" : "gap-3 rounded-2xl border border-line bg-surface-2 p-2 pr-3 hover:border-faint",
+          compact ? "gap-2 rounded-full p-1 pr-2 active:bg-white/[0.06]" : "gap-3 rounded-2xl border border-white/10 bg-white/[0.05] p-2 pr-3 hover:bg-white/[0.08]",
         )}
       >
         {active ? <SquadBadge g={active} size={compact ? 28 : 32} /> : <span className="h-8 w-8 rounded-xl border border-dashed border-faint" />}
@@ -59,7 +59,7 @@ export function SquadSwitcher({ groups, activeId, className, compact }: { groups
       {open ? (
         <div
           role="listbox"
-          className="absolute left-0 right-0 top-full z-50 mt-2 min-w-64 max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-2xl border border-line bg-surface-2 p-1.5 shadow-2xl animate-rise"
+          className="absolute left-0 right-0 top-full z-50 mt-2 min-w-64 max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-3xl border border-white/10 bg-sheet/85 p-1.5 shadow-2xl backdrop-blur-3xl animate-rise"
         >
           {groups.length === 0 ? <p className="px-3 py-2 text-sm text-muted">No squads yet.</p> : null}
           {groups.map((g) => (
@@ -67,7 +67,7 @@ export function SquadSwitcher({ groups, activeId, className, compact }: { groups
               key={g.id}
               href={`/g/${g.id}`}
               onClick={() => setOpen(false)}
-              className="flex items-center gap-3 rounded-xl px-2 py-2 transition hover:bg-surface-3"
+              className="flex items-center gap-3 rounded-xl px-2 py-2 transition hover:bg-white/[0.08]"
             >
               <SquadBadge g={g} size={28} />
               <span className="min-w-0 flex-1">
@@ -80,10 +80,10 @@ export function SquadSwitcher({ groups, activeId, className, compact }: { groups
             </Link>
           ))}
           <div className="my-1 h-px bg-line" />
-          <Link href="/squads/new" onClick={() => setOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition hover:bg-surface-3">
+          <Link href="/squads/new" onClick={() => setOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition hover:bg-white/[0.08]">
             <Plus className="h-4 w-4 text-lime" /> New squad
           </Link>
-          <Link href="/squads/join" onClick={() => setOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition hover:bg-surface-3">
+          <Link href="/squads/join" onClick={() => setOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition hover:bg-white/[0.08]">
             <KeyRound className="h-4 w-4 text-pink" /> Join with a code
           </Link>
         </div>

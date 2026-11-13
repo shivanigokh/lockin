@@ -55,14 +55,14 @@ export function ActivityCalendar({
     <div>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <Link href={link({ d: prev })} className="rounded-xl border border-line p-2 text-muted transition hover:text-ink" aria-label="Previous">
+          <Link href={link({ d: prev })} className="glass flex h-10 w-10 items-center justify-center rounded-full text-muted transition hover:text-ink" aria-label="Previous">
             <ChevronLeft className="h-4 w-4" />
           </Link>
-          <h2 className="min-w-32 text-center font-display text-lg font-black uppercase leading-tight sm:min-w-44 sm:text-xl">{title}</h2>
-          <Link href={link({ d: next })} className="rounded-xl border border-line p-2 text-muted transition hover:text-ink" aria-label="Next">
+          <h2 className="min-w-32 text-center font-display text-lg font-semibold tracking-tight leading-tight sm:min-w-44 sm:text-xl">{title}</h2>
+          <Link href={link({ d: next })} className="glass flex h-10 w-10 items-center justify-center rounded-full text-muted transition hover:text-ink" aria-label="Next">
             <ChevronRight className="h-4 w-4" />
           </Link>
-          <Link href={link({ d: today })} className="ml-1 font-mono text-[11px] uppercase text-muted hover:text-lime">
+          <Link href={link({ d: today })} className="ml-1 text-[13px] font-medium text-muted hover:text-lime">
             Today
           </Link>
         </div>
@@ -72,12 +72,12 @@ export function ActivityCalendar({
               streak <b className="text-lime">{streak}d</b>
             </span>
           ) : null}
-          <div className="inline-flex rounded-xl border border-line bg-surface p-1">
+          <div className="glass inline-flex rounded-full p-1">
             {(["week", "month"] as const).map((v) => (
               <Link
                 key={v}
                 href={`${basePath}?${new URLSearchParams({ view: v, d: anchor })}`}
-                className={cn("rounded-lg px-3 py-1.5 font-mono text-[11px] uppercase", view === v ? "bg-lime text-black" : "text-muted hover:text-ink")}
+                className={cn("rounded-full px-3.5 py-1.5 text-[13px] font-semibold capitalize", view === v ? "bg-white/[0.14] text-ink" : "text-muted hover:text-ink")}
               >
                 {v}
               </Link>
@@ -117,7 +117,7 @@ export function ActivityCalendar({
                 </span>
                 {showHabits && info?.habitsDone ? (
                   <span
-                    className={cn("rounded-full px-1 font-mono text-[9px]", info.allHabits ? "bg-lime text-black" : "bg-surface-3 text-muted")}
+                    className={cn("rounded-full px-1 font-mono text-[9px]", info.allHabits ? "bg-lime text-[#141218]" : "bg-surface-3 text-muted")}
                     title={`${info.habitsDone}/${info.habitsTotal} habits`}
                   >
                     {info.habitsDone}/{info.habitsTotal}
@@ -153,7 +153,7 @@ export function ActivityCalendar({
                   {entries.map((e, i) => {
                     const a = activity(e.type);
                     return (
-                      <li key={i} className="flex items-center gap-1 rounded-md px-1.5 py-0.5 text-xs text-black sm:truncate sm:px-1 sm:text-[10px]" style={{ background: a.color }} title={`${e.who ? e.who + ": " : ""}${e.label} ${e.minutes}m`}>
+                      <li key={i} className="flex items-center gap-1 rounded-md px-1.5 py-0.5 text-xs text-[#141218] sm:truncate sm:px-1 sm:text-[10px]" style={{ background: a.color }} title={`${e.who ? e.who + ": " : ""}${e.label} ${e.minutes}m`}>
                         <a.icon className="h-3 w-3 shrink-0" />
                         <span className="sm:truncate">{e.who ? `${e.who} · ${e.minutes}m` : `${e.label} · ${e.minutes}m`}</span>
                       </li>
@@ -177,7 +177,7 @@ export function ActivityCalendar({
         </span>
         {showHabits ? (
           <span className="flex items-center gap-1.5 text-xs text-muted">
-            <span className="rounded-full bg-lime px-1 font-mono text-[9px] text-black">6/6</span> all habits done
+            <span className="rounded-full bg-lime px-1 font-mono text-[9px] text-[#141218]">6/6</span> all habits done
           </span>
         ) : null}
       </div>

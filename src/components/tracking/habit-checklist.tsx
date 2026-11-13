@@ -6,7 +6,7 @@ import { habitIcon } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { toggleHabit } from "@/app/actions/tracking";
 import { useToast } from "@/components/ui/toast";
-import { ProgressBar } from "@/components/ui/progress";
+import { ProgressRing } from "@/components/ui/progress";
 
 export type HabitRow = { id: string; name: string; icon: string; visible_to_groups: boolean; done: boolean };
 
@@ -23,12 +23,14 @@ export function HabitChecklist({ habits, day, shareHabits }: { habits: HabitRow[
 
   return (
     <div>
-      <div className="mb-3 flex items-center gap-3">
-        <span className="font-display text-2xl font-black tabular-nums sm:text-4xl">
-          {done}
-          <span className="text-faint">/{total}</span>
-        </span>
-        <ProgressBar value={total ? (done / total) * 100 : 0} className="flex-1" />
+      <div className="mb-4 flex items-center gap-4">
+        <ProgressRing value={total ? done / total : 0} label={`${done}/${total}`} />
+        <div className="min-w-0">
+          <p className="text-[15px] font-semibold">
+            {done === total && total > 0 ? "All done. Insufferable." : done === 0 ? "Nothing ticked yet" : `${total - done} to go`}
+          </p>
+          <p className="text-[13px] text-muted">Tap a habit when you&apos;ve done it.</p>
+        </div>
       </div>
       <ul className="grid grid-cols-2 gap-2">
         {optimistic.map((h) => {
@@ -55,7 +57,7 @@ export function HabitChecklist({ habits, day, shareHabits }: { habits: HabitRow[
                 <span
                   className={cn(
                     "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition sm:h-8 sm:w-8 sm:rounded-xl",
-                    h.done ? "bg-lime text-black animate-pop" : "bg-surface-3 text-muted",
+                    h.done ? "bg-lime text-[#141218] animate-pop" : "bg-surface-3 text-muted",
                   )}
                 >
                   {h.done ? <Check className="h-5 w-5" strokeWidth={3} /> : <Icon className="h-4 w-4" />}

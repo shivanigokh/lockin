@@ -18,7 +18,7 @@ export default async function FeedPage({ params, searchParams }: { params: Promi
 
   return (
     <Page className="max-w-3xl">
-      <PageHeader label={`// ${group.name}`} title="The feed" sub="Workouts, wins and unhinged motivational messages. Squad members only." />
+      <PageHeader label={`${group.name}`} title="The feed" sub="Workouts, wins and unhinged motivational messages. Squad members only." />
       <Card>
         <Composer groupId={groupId} />
         <FeedList items={items} meId={me.user.id} groupId={groupId} isAdmin={isAdmin} />

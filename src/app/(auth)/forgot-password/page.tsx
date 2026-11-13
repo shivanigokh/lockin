@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Reset password" };
 export default function ForgotPage() {
   return (
     <>
-      <p className="label-mono mb-2">// it happens to the best of us</p>
+      <p className="label-mono mb-2">it happens to the best of us</p>
       <h1 className="display mb-8 text-5xl">Forgot it?</h1>
       <AuthForm action={requestPasswordReset} submit="Send reset link">
         <Field label="Email" htmlFor="email">

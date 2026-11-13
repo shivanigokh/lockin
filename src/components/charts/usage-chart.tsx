@@ -15,9 +15,9 @@ export function UsageChart({ data }: { data: { date: string; signups: number; ac
           <YAxis allowDecimals={false} {...axis} />
           <Tooltip {...chartTooltip} labelFormatter={(l) => short(String(l))} />
           <Legend wrapperStyle={{ fontSize: 11, fontFamily: "var(--font-mono)" }} />
-          <Bar dataKey="workouts" name="workouts logged" fill="#b8a6ff" radius={[4, 4, 0, 0]} barSize={10} />
-          <Line type="monotone" dataKey="active" name="active users" stroke="#c8ff2e" strokeWidth={2.5} dot={false} />
-          <Line type="monotone" dataKey="signups" name="new sign-ups" stroke="#ff6ec7" strokeWidth={2} dot={false} />
+          <Bar dataKey="workouts" name="workouts logged" fill="#c6c7ff" radius={[4, 4, 0, 0]} barSize={10} />
+          <Line type="monotone" dataKey="active" name="active users" stroke="#979aff" strokeWidth={2.5} dot={false} />
+          <Line type="monotone" dataKey="signups" name="new sign-ups" stroke="#ff6b57" strokeWidth={2} dot={false} />
         </ComposedChart>
       </ResponsiveContainer>
     </div>
@@ -33,7 +33,7 @@ export function TypeChart({ data }: { data: { name: string; value: number; color
           <XAxis type="number" hide allowDecimals={false} />
           <YAxis type="category" dataKey="name" width={110} {...axis} />
           <Tooltip {...chartTooltip} formatter={(v) => [v, "workouts"]} />
-          <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={16} fill="#c8ff2e" />
+          <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={16} fill="#979aff" />
         </BarChart>
       </ResponsiveContainer>
     </div>

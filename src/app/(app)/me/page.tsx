@@ -87,7 +87,7 @@ export default async function MyHealthPage() {
 
   return (
     <Page>
-      <PageHeader label="// the vault" title="My health" sub="Only you can see this page. Not your squads, not your squad admins, not us showing off at parties.">
+      <PageHeader label="the vault" title="My health" sub="Only you can see this page. Not your squads, not your squad admins, not us showing off at parties.">
         <Badge color="var(--color-pink)">
           <Lock className="h-3 w-3" /> private
         </Badge>
@@ -139,14 +139,16 @@ export default async function MyHealthPage() {
             <ul className="space-y-2.5">
               {byType.map((a) => (
                 <li key={a.value} className="flex items-center gap-3">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-black" style={{ background: a.color }}>
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[#141218]" style={{ background: a.color }}>
                     <a.icon className="h-4 w-4" />
                   </span>
                   <span className="wrap-text flex-1 text-sm font-semibold">{a.label}</span>
                   <span className="whitespace-nowrap font-mono text-xs text-muted">
                     {a.n}× {a.km ? `· ${fmtNum(a.km, 1)} km` : ""}
                   </span>
-                  <ProgressBar value={(a.n / Math.max(...byType.map((b) => b.n))) * 100} size="sm" color={a.color} className="w-14 shrink-0 sm:w-24" />
+                  <div className="w-14 shrink-0 sm:w-24">
+                    <ProgressBar value={(a.n / Math.max(...byType.map((b) => b.n))) * 100} size="sm" color={a.color} />
+                  </div>
                 </li>
               ))}
             </ul>
@@ -189,10 +191,10 @@ export default async function MyHealthPage() {
           <MeasurementChart
             data={msChart}
             keys={[
-              { key: "waist", label: `waist ${lu}`, color: "#c8ff2e" },
-              { key: "hips", label: `hips ${lu}`, color: "#ff6ec7" },
-              { key: "chest", label: `chest ${lu}`, color: "#5be4ea" },
-              { key: "bodyfat", label: "body fat %", color: "#b8a6ff" },
+              { key: "waist", label: `waist ${lu}`, color: "#979aff" },
+              { key: "hips", label: `hips ${lu}`, color: "#ff6b57" },
+              { key: "chest", label: `chest ${lu}`, color: "#7fd3e6" },
+              { key: "bodyfat", label: "body fat %", color: "#c6c7ff" },
             ]}
           />
           <div className="mt-4 border-t border-line/60 pt-4 sm:mt-5 sm:pt-5">
@@ -215,7 +217,7 @@ function BigStat({ label, value, unit, color }: { label: string; value: string; 
   return (
     <div className="card px-3 py-2.5 sm:p-4">
       <div className="label-mono text-[10px]">{label}</div>
-      <div className="mt-0.5 font-display text-2xl font-black tabular-nums sm:mt-1 sm:text-4xl" style={{ color }}>
+      <div className="mt-0.5 font-display text-2xl font-bold tabular-nums sm:mt-1 sm:text-4xl" style={{ color }}>
         {value}
         {value !== "–" ? <span className="ml-1 font-mono text-sm font-normal text-muted">{unit}</span> : null}
       </div>

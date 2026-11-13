@@ -26,7 +26,7 @@ export default async function NotificationsPage() {
 
   return (
     <Page className="max-w-2xl">
-      <PageHeader label="// pings" title="Notifications" sub="Change what pings you in Settings → Notifications.">
+      <PageHeader label="pings" title="Notifications" sub="Change what pings you in Settings → Notifications.">
         <NotificationActions unread={unread} total={items.length} />
       </PageHeader>
       {items.length ? (

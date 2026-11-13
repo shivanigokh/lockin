@@ -10,8 +10,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   const { next, error } = await searchParams;
   return (
     <>
-      <p className="label-mono mb-2">// welcome back</p>
-      <h1 className="display mb-8 text-5xl">Lock back in.</h1>
+      <h1 className="display mb-8 text-5xl">Welcome back.</h1>
       {error ? <p className="mb-4 rounded-xl border border-danger/30 bg-danger/5 px-3 py-2 text-sm text-[#ffb3b3]">{error}</p> : null}
       <AuthForm action={signIn} submit="Log in" next={next}>
         <Field label="Email" htmlFor="email">

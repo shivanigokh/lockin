@@ -13,7 +13,7 @@ export function LeaderboardChart({ data, unit }: { data: { name: string; value: 
           <Tooltip {...chartTooltip} formatter={(v) => [`${v} ${unit}`, ""]} />
           <Bar dataKey="value" radius={[0, 8, 8, 0]} barSize={18}>
             {data.map((d, i) => (
-              <Cell key={i} fill={d.me ? "#c8ff2e" : "#b8a6ff"} />
+              <Cell key={i} fill={d.me ? "#979aff" : "#c6c7ff"} />
             ))}
           </Bar>
         </BarChart>

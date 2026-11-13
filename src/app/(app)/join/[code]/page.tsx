@@ -19,7 +19,7 @@ export default async function InvitePage({ params }: { params: Promise<{ code: s
     <Page className="max-w-xl">
       {!inv?.group_id ? (
         <Card className="text-center">
-          <p className="label-mono mb-2">// hmm</p>
+          <p className="label-mono mb-2">hmm</p>
           <h1 className="display text-4xl">Invite not found.</h1>
           <p className="mt-3 text-sm text-muted">Double-check the link, or ask for a fresh code.</p>
           <Link href="/squads/join" className={buttonClass("secondary", "md", "mt-6")}>
@@ -28,7 +28,7 @@ export default async function InvitePage({ params }: { params: Promise<{ code: s
         </Card>
       ) : (
         <Card className="p-8 text-center">
-          <p className="label-mono mb-6">// you&apos;ve been summoned</p>
+          <p className="label-mono mb-6">you&apos;ve been summoned</p>
           <div className="flex justify-center">
             <SquadBadge g={{ icon: inv.icon!, color: inv.color! }} size={88} />
           </div>

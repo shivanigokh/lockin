@@ -10,7 +10,7 @@ export default async function SignupPage({ searchParams }: { searchParams: Promi
   const { next } = await searchParams;
   return (
     <>
-      <p className="label-mono mb-2">// membership is free, excuses are not</p>
+      <p className="label-mono mb-2">membership is free, excuses are not</p>
       <h1 className="display mb-8 text-5xl">Join the club.</h1>
       <AuthForm action={signUp} submit="Create account" next={next} withTimezone>
         <Field label="Username" htmlFor="username" hint="What your squad calls you. Lowercase, numbers, underscores.">

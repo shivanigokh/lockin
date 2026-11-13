@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ArrowRight, Swords, Trophy, Users } from "lucide-react";
+import { ArrowRight, CalendarDays, Swords, Trophy, Users } from "lucide-react";
 import { getGroup } from "@/lib/data";
 import { createClient } from "@/lib/supabase/server";
 import { getFeed } from "@/lib/feed";
@@ -58,25 +58,28 @@ export default async function GroupDashboard({ params }: { params: Promise<{ gro
 
   return (
     <Page>
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-4 sm:mb-6">
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-4 sm:mb-6">
         <div className="flex min-w-0 items-center gap-4">
           <span className="hidden sm:block">
             <SquadBadge g={group} size={56} />
           </span>
           <div className="min-w-0">
-            <p className="label-mono text-lime">{prettyDate(today)}</p>
-            <h1 className="display wrap-text hidden text-5xl sm:block">{group.name}</h1>
+            <p className="text-[13px] font-medium text-muted">{prettyDate(today)}</p>
+            <h1 className="display wrap-text text-[34px] sm:text-5xl">
+              <span className="sm:hidden">Today</span>
+              <span className="hidden sm:inline">{group.name}</span>
+            </h1>
             <p className="mt-1 text-sm text-muted sm:hidden">{greeting}</p>
           </div>
         </div>
-        <p className="label-mono hidden sm:block">{greeting}</p>
+        <p className="hidden text-sm text-muted sm:block">{greeting}</p>
       </div>
 
       {filling ? (
         <Card className="mb-4 border-pink/40 bg-[color-mix(in_srgb,var(--color-pink)_6%,var(--color-surface))] sm:mb-5">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className="label-mono hidden text-pink sm:block">// squad filling · {group.member_count}/{MIN_MEMBERS} to unlock</p>
+              <p className="label-mono hidden text-pink sm:block">squad filling · {group.member_count}/{MIN_MEMBERS} to unlock</p>
               <h2 className="text-base font-bold sm:mt-1 sm:text-xl">
                 Invite {MIN_MEMBERS - group.member_count} more {MIN_MEMBERS - group.member_count === 1 ? "friend" : "friends"} to unlock leaderboards and challenges.
               </h2>
@@ -93,18 +96,17 @@ export default async function GroupDashboard({ params }: { params: Promise<{ gro
       <div className="flex flex-col gap-4 lg:grid lg:grid-cols-[1.35fr_1fr] lg:items-start lg:gap-5">
         <div className="contents lg:block lg:space-y-5">
           <Card className="order-1">
-            <CardHeader label="today's accountability" title="Did you though?" />
+            <CardHeader title="Did you though?" />
             <HabitChecklist habits={habits} day={today} shareHabits={me.settings.share_habits} />
           </Card>
 
           <Card className="order-2">
-            <CardHeader label="your workouts today" title={myWorkouts.data?.length ? "Today's workouts" : "Nothing logged yet"} />
+            <CardHeader title={myWorkouts.data?.length ? "Today's workouts" : "Nothing logged yet"} />
             <MyTodayWorkouts workouts={myWorkouts.data ?? []} today={today} defaultVisibility={me.settings.default_workout_visibility} />
           </Card>
 
           <Card className="order-5">
             <CardHeader
-              label="squad feed"
               title="What's happening"
               action={
                 <Link href={`/g/${groupId}/feed`} className="inline-flex items-center gap-1 py-1 text-xs text-muted hover:text-lime">
@@ -120,7 +122,6 @@ export default async function GroupDashboard({ params }: { params: Promise<{ gro
         <div className="contents lg:block lg:space-y-5">
           <Card className="order-3">
             <CardHeader
-              label="squad check-ins"
               title="Your squad today"
               action={
                 <Link href={`/g/${groupId}/leaderboard`} className="inline-flex items-center gap-1 py-1 text-xs text-muted hover:text-lime">
@@ -158,7 +159,6 @@ export default async function GroupDashboard({ params }: { params: Promise<{ gro
 
           <Card className="order-4">
             <CardHeader
-              label="challenges"
               title={filling ? "Challenges locked" : challenges.data?.length ? "Challenges live now" : "No challenges running"}
               action={
                 <Link href={`/g/${groupId}/challenges`} className="inline-flex items-center gap-1 py-1 text-xs text-muted hover:text-lime">
@@ -185,10 +185,17 @@ export default async function GroupDashboard({ params }: { params: Promise<{ gro
             )}
           </Card>
 
-          <Link href={`/g/${groupId}/squad`} className="order-6 flex items-center gap-3 px-1 py-2 text-sm text-muted transition hover:text-ink lg:rounded-[var(--radius-card)] lg:border lg:border-line lg:bg-surface lg:p-4">
-            <Users className="h-4 w-4" /> {group.member_count}/10 members · {isAdmin ? "you're an admin" : "see the squad"}
-            <ArrowRight className="ml-auto h-4 w-4" />
-          </Link>
+          <div className="card order-6 divide-y divide-white/[0.07] overflow-hidden p-0">
+            <Link href={`/g/${groupId}/squad`} className="flex items-center gap-3 px-4 py-3.5 text-[15px] transition hover:bg-white/[0.04]">
+              <Users className="h-[18px] w-[18px] text-lavender" /> {group.member_count}/10 members
+              <span className="ml-auto text-sm text-muted">{isAdmin ? "Admin" : ""}</span>
+              <ArrowRight className="h-4 w-4 text-faint" />
+            </Link>
+            <Link href={`/g/${groupId}/calendar`} className="flex items-center gap-3 px-4 py-3.5 text-[15px] transition hover:bg-white/[0.04]">
+              <CalendarDays className="h-[18px] w-[18px] text-pink" /> Squad calendar
+              <ArrowRight className="ml-auto h-4 w-4 text-faint" />
+            </Link>
+          </div>
         </div>
       </div>
     </Page>
@@ -198,7 +205,7 @@ export default async function GroupDashboard({ params }: { params: Promise<{ gro
 function Stat({ value, label, color }: { value: number; label: string; color: string }) {
   return (
     <div className="rounded-xl bg-surface-2 px-3 py-2.5">
-      <div className="font-display text-3xl font-black tabular-nums" style={{ color }}>
+      <div className="font-display text-3xl font-bold tabular-nums" style={{ color }}>
         {value}
       </div>
       <div className="mt-0.5 text-xs text-muted">{label}</div>

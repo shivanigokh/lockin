@@ -119,7 +119,7 @@ function FeedRow({ item, meId, groupId, isAdmin }: { item: FeedItemData; meId: s
   const [optimistic, setOptimistic] = useState(item.reactions);
   const { text, icon } = describe(item, meId);
   const isMessage = item.kind === "message";
-  const name = item.actor ? displayName(item.actor) : "LOCK IN";
+  const name = item.actor ? displayName(item.actor) : "nudge";
   const counts = REACTIONS.map((r) => ({
     ...r,
     n: optimistic.filter((x) => x.emoji === r.key).length,

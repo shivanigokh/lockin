@@ -34,7 +34,7 @@ export default async function SquadPage({ params, searchParams }: { params: Prom
 
   return (
     <Page className="max-w-4xl">
-      <PageHeader label="// squad hq" title={group.name} sub={group.description ?? undefined}>
+      <PageHeader label="squad hq" title={group.name} sub={group.description ?? undefined}>
         <span className="hidden sm:block">
           <SquadBadge g={group} size={56} />
         </span>
@@ -42,7 +42,7 @@ export default async function SquadPage({ params, searchParams }: { params: Prom
 
       {created ? (
         <Card className="mb-4 border-lime/50 bg-lime/5 sm:mb-5">
-          <p className="label-mono hidden text-lime sm:block">// squad created</p>
+          <p className="label-mono hidden text-lime sm:block">squad created</p>
           <p className="font-semibold sm:mt-1">Now send the invite code to 2+ friends. The squad unlocks at {MIN_MEMBERS} members.</p>
         </Card>
       ) : null}

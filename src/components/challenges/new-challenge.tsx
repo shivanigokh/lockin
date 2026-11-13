@@ -51,7 +51,7 @@ export function NewChallengeButton({ groupId, today }: { groupId: string; today:
       <Button onClick={() => setOpen(true)}>
         <Plus className="h-4 w-4" /> New challenge
       </Button>
-      <Modal open={open} onClose={() => setOpen(false)} title="New challenge" label="// chaos is a ladder">
+      <Modal open={open} onClose={() => setOpen(false)} title="New challenge" label="chaos is a ladder">
         <div className="mb-5 flex flex-wrap gap-1.5">
           {PRESETS.map((p) => (
             <button key={p.label} type="button" onClick={() => set({ ...blank, ...p.make(today) })} className="rounded-full border border-line px-2.5 py-1 font-mono text-[10px] uppercase text-muted transition hover:border-orange hover:text-orange cursor-pointer">

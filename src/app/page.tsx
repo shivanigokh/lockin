@@ -34,13 +34,18 @@ export default async function Landing({ searchParams }: { searchParams: Promise<
       ) : null}
 
       <section className="mx-auto max-w-6xl px-5 pb-16 pt-12 sm:pt-20">
-        <p className="label-mono mb-6 text-lime">// a private internet club for moving your body</p>
-        <h1 className="display text-[clamp(3.5rem,13vw,10rem)]">
-          Lock
-          <span className="relative mx-3 inline-block -rotate-2 rounded-2xl bg-lime px-3 text-black">in</span>
-          <br />
-          <span className="text-transparent [-webkit-text-stroke:2px_var(--color-ink)]">or else.</span>
-        </h1>
+        <div className="relative">
+          <div className="pointer-events-none relative mb-6 h-24 w-28 sm:absolute sm:-top-10 sm:right-10 sm:mb-0 sm:h-72 sm:w-72" aria-hidden>
+            <span className="absolute left-[8%] top-[30%] h-[58%] w-[58%] rounded-full bg-[radial-gradient(circle_at_35%_30%,#fff,#d9daff_40%,#7579e0)] shadow-[0_0_80px_10px_rgba(117,121,224,0.55)] blur-[2px]" />
+            <span className="absolute right-[6%] top-[8%] h-[40%] w-[40%] rounded-full bg-[radial-gradient(circle_at_35%_30%,#fff,#ffd2cb_40%,#e94b3c)] shadow-[0_0_70px_6px_rgba(233,75,60,0.5)] blur-[2px]" />
+          </div>
+          <p className="relative mb-4 text-[15px] font-medium text-lavender">A tiny accountability club for you and your friends</p>
+          <h1 className="display relative max-w-3xl text-[clamp(3rem,12vw,7.5rem)]">
+            Get <span className="bg-gradient-to-r from-[#c6c7ff] to-[#ff8a78] bg-clip-text text-transparent">nudged</span>
+            <br />
+            off the couch.
+          </h1>
+        </div>
         <div className="mt-10 flex flex-col gap-8 sm:flex-row sm:items-end sm:justify-between">
           <p className="max-w-lg text-lg text-muted">
             The social accountability app for you and your friends. Eat better, drink less, walk, run, swim, sleep. Then rub it in the group chat. {COPY.couch}
@@ -56,13 +61,13 @@ export default async function Landing({ searchParams }: { searchParams: Promise<
         </div>
       </section>
 
-      <Marquee className="-rotate-1" />
+      <Marquee />
 
       <section className="mx-auto grid max-w-6xl gap-4 px-5 py-20 sm:grid-cols-2">
         {features.map((f) => (
-          <div key={f.title} className="card group p-7 transition hover:-translate-y-0.5 hover:border-faint">
+          <div key={f.title} className="card group p-7 transition hover:-translate-y-0.5">
             <f.icon className="mb-6 h-8 w-8 transition group-hover:animate-wiggle" style={{ color: f.color }} />
-            <h2 className="font-display text-2xl font-black uppercase">{f.title}</h2>
+            <h2 className="font-display text-2xl font-semibold tracking-tight">{f.title}</h2>
             <p className="mt-3 text-muted">{f.body}</p>
           </div>
         ))}
@@ -79,9 +84,9 @@ export default async function Landing({ searchParams }: { searchParams: Promise<
         </div>
       </section>
 
-      <footer className="border-t border-line px-5 py-8">
+      <footer className="border-t border-white/[0.06] px-5 py-8">
         <div className="mx-auto flex max-w-6xl flex-col justify-between gap-2 text-xs text-faint sm:flex-row">
-          <span className="font-mono uppercase tracking-widest">{COPY.tagline}</span>
+          <span>{COPY.tagline}</span>
           <span>Made for friends. Not medical advice.</span>
         </div>
       </footer>

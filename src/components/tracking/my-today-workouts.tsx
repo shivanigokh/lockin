@@ -16,7 +16,7 @@ export function WorkoutItem({ w, today, defaultVisibility, showDate }: { w: Work
   const a = activity(w.activity_type);
   return (
     <li className="flex items-center gap-3 rounded-xl bg-surface-2 py-2 pl-2.5 pr-1 sm:rounded-2xl sm:border sm:border-line sm:px-3 sm:py-2.5">
-      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-black sm:h-9 sm:w-9 sm:rounded-xl" style={{ background: a.color }}>
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[#141218] sm:h-9 sm:w-9 sm:rounded-xl" style={{ background: a.color }}>
         <a.icon className="h-4 w-4" />
       </span>
       <div className="min-w-0 flex-1">
@@ -67,7 +67,7 @@ export function MyTodayWorkouts({ workouts, today, defaultVisibility }: { workou
       <Button variant={workouts.length ? "secondary" : "primary"} onClick={() => setOpen(true)} className="w-full">
         <Plus className="h-4 w-4" /> Log a workout
       </Button>
-      <Modal open={open} onClose={() => setOpen(false)} title="Log a workout" label="// receipts or it didn't happen">
+      <Modal open={open} onClose={() => setOpen(false)} title="Log a workout" label="receipts or it didn't happen">
         <WorkoutForm today={today} defaultVisibility={defaultVisibility} onDone={() => setOpen(false)} />
       </Modal>
     </div>

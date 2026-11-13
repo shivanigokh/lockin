@@ -34,7 +34,7 @@ export default async function WorkoutsPage({ searchParams }: { searchParams: Pro
 
   return (
     <Page className="max-w-3xl">
-      <PageHeader label="// receipts" title="My workouts" sub="Edit or delete anything you've logged. Private workouts (lock icon) never leave this page." />
+      <PageHeader label="receipts" title="My workouts" sub="Edit or delete anything you've logged. Private workouts (lock icon) never leave this page." />
       <Card className="mb-5">
         <MyTodayWorkouts workouts={[]} today={me.today} defaultVisibility={me.settings.default_workout_visibility} />
       </Card>
@@ -43,7 +43,7 @@ export default async function WorkoutsPage({ searchParams }: { searchParams: Pro
           <Link href={`/workouts?m=${prev}`} className="rounded-xl border border-line p-2 text-muted hover:text-ink" aria-label="Previous month">
             <ChevronLeft className="h-4 w-4" />
           </Link>
-          <h2 className="min-w-36 text-center font-display text-xl font-black uppercase">{format(parseISO(anchor), "MMM yyyy")}</h2>
+          <h2 className="min-w-36 text-center font-display text-xl font-semibold tracking-tight">{format(parseISO(anchor), "MMM yyyy")}</h2>
           {!isCurrent ? (
             <Link href={`/workouts?m=${next}`} className="rounded-xl border border-line p-2 text-muted hover:text-ink" aria-label="Next month">
               <ChevronRight className="h-4 w-4" />

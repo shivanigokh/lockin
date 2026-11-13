@@ -54,7 +54,7 @@ export default async function MyCalendarPage({ searchParams }: { searchParams: P
 
   return (
     <Page>
-      <PageHeader label="// just you" title="My calendar" sub="All your workouts (private ones too), daily habit scores and the challenges you've joined." />
+      <PageHeader label="just you" title="My calendar" sub="All your workouts (private ones too), daily habit scores and the challenges you've joined." />
       <Card>
         <ActivityCalendar basePath="/calendar" view={view} anchor={anchor} today={me.today} days={days} events={events} showHabits streak={s} />
       </Card>

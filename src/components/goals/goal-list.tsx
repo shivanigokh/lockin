@@ -46,7 +46,7 @@ function GoalCard({ goal, groups, today }: { goal: GoalWithProgress; groups: MyG
           </div>
           <h3 className="text-lg font-bold leading-tight">{goal.title}</h3>
         </div>
-        <span className={cn("font-display text-4xl font-black tabular-nums", done ? "text-lime" : "text-ink")}>{goal.pct}%</span>
+        <span className={cn("font-display text-4xl font-bold tabular-nums", done ? "text-lime" : "text-ink")}>{goal.pct}%</span>
       </div>
       <ProgressBar value={goal.pct} size="lg" color={done ? "var(--color-lime)" : "var(--color-pink)"} />
       <div className="mt-2 flex justify-between font-mono text-xs text-muted">
@@ -128,7 +128,7 @@ export function GoalList({ goals, groups, today, openNew, presetShare }: { goals
           </div>
         </details>
       ) : null}
-      <Modal open={open} onClose={() => setOpen(false)} title="New goal" label="// say it out loud">
+      <Modal open={open} onClose={() => setOpen(false)} title="New goal" label="say it out loud">
         <GoalForm groups={groups} today={today} presetShare={presetShare} onDone={() => setOpen(false)} />
       </Modal>
     </>

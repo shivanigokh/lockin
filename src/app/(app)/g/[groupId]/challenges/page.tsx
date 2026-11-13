@@ -18,7 +18,7 @@ export default async function ChallengesPage({ params }: { params: Promise<{ gro
   if (group.member_count < MIN_MEMBERS) {
     return (
       <Page className="max-w-4xl">
-        <PageHeader label={`// ${group.name}`} title="Challenges" />
+        <PageHeader label={`${group.name}`} title="Challenges" />
         <Empty title="Locked until 3 members" body="Challenges need rivals. Invite more people from the Squad tab." />
       </Page>
     );
@@ -69,7 +69,7 @@ export default async function ChallengesPage({ params }: { params: Promise<{ gro
   return (
     <Page className="max-w-5xl">
       <PageHeader
-        label={`// ${group.name}`}
+        label={`${group.name}`}
         title="Challenges"
         sub="Admins set them. Everyone can join or bail. Progress comes from squad-visible workouts and habits, or self-reported numbers."
       >

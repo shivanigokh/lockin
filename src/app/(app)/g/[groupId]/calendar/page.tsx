@@ -49,7 +49,7 @@ export default async function SquadCalendarPage({
 
   return (
     <Page>
-      <PageHeader label={`// ${group.name}`} title="Squad calendar" sub="Everyone's squad-visible workouts and challenge dates. Private workouts never show up here." />
+      <PageHeader label={`${group.name}`} title="Squad calendar" sub="Everyone's squad-visible workouts and challenge dates. Private workouts never show up here." />
       <Card>
         <ActivityCalendar basePath={`/g/${groupId}/calendar`} view={view} anchor={anchor} today={me.today} days={days} events={events} />
       </Card>

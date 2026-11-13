@@ -32,7 +32,7 @@ export default async function SharedGoalsPage({ params }: { params: Promise<{ gr
 
   return (
     <Page className="max-w-4xl">
-      <PageHeader label={`// ${group.name}`} title="Shared goals" sub="Goals people chose to share with this squad. Only the name, target, progress and percentage show up here.">
+      <PageHeader label={`${group.name}`} title="Shared goals" sub="Goals people chose to share with this squad. Only the name, target, progress and percentage show up here.">
         <Link href={`/goals?new=1&share=${groupId}`} className={buttonClass("primary")}>
           <Plus className="h-4 w-4" /> Share a goal
         </Link>
@@ -41,7 +41,7 @@ export default async function SharedGoalsPage({ params }: { params: Promise<{ gr
       {rows.length ? (
         <>
           <Card className="mb-5 flex items-center gap-5">
-            <div className="font-display text-6xl font-black text-lime tabular-nums">{avg}%</div>
+            <div className="font-display text-6xl font-bold text-lime tabular-nums">{avg}%</div>
             <div>
               <div className="label-mono">squad average</div>
               <p className="text-sm text-muted">
@@ -64,7 +64,7 @@ export default async function SharedGoalsPage({ params }: { params: Promise<{ gr
                       <li key={g.goal_id}>
                         <div className="mb-1.5 flex items-baseline justify-between gap-3">
                           <span className="min-w-0 wrap-text font-semibold">{g.title}</span>
-                          <span className={cn("font-display text-2xl font-black tabular-nums", g.pct >= 100 ? "text-lime" : "text-ink")}>{g.pct}%</span>
+                          <span className={cn("font-display text-2xl font-bold tabular-nums", g.pct >= 100 ? "text-lime" : "text-ink")}>{g.pct}%</span>
                         </div>
                         <ProgressBar value={g.pct} size="lg" color={g.pct >= 100 ? "var(--color-lime)" : isMe ? "var(--color-pink)" : "var(--color-lavender)"} />
                         <div className="mt-1.5 flex items-center justify-between gap-2 font-mono text-xs text-muted">

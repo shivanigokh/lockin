@@ -22,7 +22,7 @@ export function InviteLink({ code, groupName }: { code: string; groupName: strin
   async function share() {
     if (navigator.share) {
       try {
-        await navigator.share({ title: `Join ${groupName} on LOCK IN`, text: `Get in, loser. Code: ${code}`, url: link });
+        await navigator.share({ title: `Join ${groupName} on nudge`, text: `Get in, loser. Code: ${code}`, url: link });
       } catch {
         /* cancelled */
       }

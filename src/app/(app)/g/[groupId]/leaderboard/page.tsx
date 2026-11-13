@@ -38,7 +38,7 @@ export default async function LeaderboardPage({
   if (group.member_count < MIN_MEMBERS) {
     return (
       <Page className="max-w-3xl">
-        <PageHeader label={`// ${group.name}`} title="Leaderboard" />
+        <PageHeader label={`${group.name}`} title="Leaderboard" />
         <Empty title="Locked until 3 members" body={`Competing with yourself is called "journaling". Invite ${MIN_MEMBERS - group.member_count} more to unlock.`} />
       </Page>
     );
@@ -64,7 +64,7 @@ export default async function LeaderboardPage({
 
   return (
     <Page>
-      <PageHeader label={`// ${group.name}`} title="Leaderboard" sub={`${COPY.leaderboard} But your workout count is. One session = one workout. Never weight, calories or looks.`} />
+      <PageHeader label={`${group.name}`} title="Leaderboard" sub={`${COPY.leaderboard} But your workout count is. One session = one workout. Never weight, calories or looks.`} />
 
       <div className="mb-4 flex flex-wrap gap-2 sm:mb-5">
         <SegmentLinks param="period" options={PERIODS} defaultValue="week" />
@@ -88,7 +88,7 @@ export default async function LeaderboardPage({
                     isMe ? "border-lime/40 bg-lime/5" : "border-transparent bg-surface-2 sm:border-line",
                   )}
                 >
-                  <span className={cn("w-6 shrink-0 text-center font-display text-xl font-black sm:w-7 sm:text-2xl", r.place === 1 && r.value > 0 ? "text-lime" : "text-faint")}>
+                  <span className={cn("w-6 shrink-0 text-center font-display text-xl font-bold sm:w-7 sm:text-2xl", r.place === 1 && r.value > 0 ? "text-lime" : "text-faint")}>
                     {r.place}
                   </span>
                   <span className="relative">

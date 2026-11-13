@@ -22,7 +22,7 @@ export default async function GoalsPage({ searchParams }: { searchParams: Promis
   return (
     <Page>
       <PageHeader
-        label="// just you (unless you share)"
+        label="just you (unless you share)"
         title="My goals"
         sub="Goals are private by default. Share one with a squad and they'll see its name, target, progress and percentage. Nothing else."
       />

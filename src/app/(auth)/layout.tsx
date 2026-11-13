@@ -5,12 +5,12 @@ import { COPY } from "@/lib/constants";
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="grid min-h-dvh lg:grid-cols-[1.1fr_1fr]">
-      <aside className="relative hidden overflow-hidden border-r border-line bg-surface lg:flex lg:flex-col lg:justify-between lg:p-12">
-        <Link href="/" aria-label="LOCK IN home">
+      <aside className="glass relative hidden overflow-hidden rounded-none border-y-0 border-l-0 lg:flex lg:flex-col lg:justify-between lg:p-12">
+        <Link href="/" aria-label="nudge home">
           <Logo />
         </Link>
         <div>
-          <p className="label-mono mb-6 text-lime">// private accountability club</p>
+          <p className="mb-6 text-[15px] font-medium text-lavender">A tiny accountability club</p>
           <h1 className="display text-[clamp(4rem,8vw,8rem)]">
             Less talk.
             <br />
@@ -23,7 +23,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div className="pointer-events-none absolute -bottom-32 left-24 h-72 w-72 rounded-full bg-pink/10 blur-3xl" />
       </aside>
       <main className="flex flex-col px-5 py-8 sm:px-10">
-        <Link href="/" className="lg:hidden" aria-label="LOCK IN home">
+        <Link href="/" className="lg:hidden" aria-label="nudge home">
           <Logo />
         </Link>
         <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center py-10">{children}</div>

@@ -49,7 +49,7 @@ export function SquadForm({ initial }: { initial?: Initial }) {
       }}
     >
       <div className="flex items-center gap-4">
-        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-black transition sm:h-20 sm:w-20 sm:rounded-3xl" style={{ background: colorVar(color) }}>
+        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-[#141218] transition sm:h-20 sm:w-20 sm:rounded-3xl" style={{ background: colorVar(color) }}>
           <Icon className="h-7 w-7 sm:h-10 sm:w-10" />
         </span>
         <div className="min-w-0">
@@ -58,7 +58,7 @@ export function SquadForm({ initial }: { initial?: Initial }) {
         </div>
       </div>
 
-      <Field label="Squad name" htmlFor="s-name" hint="Unique across LOCK IN. 3–40 characters.">
+      <Field label="Squad name" htmlFor="s-name" hint="Unique across nudge. 3–40 characters.">
         <Input id="s-name" required minLength={3} maxLength={40} value={name} onChange={(e) => setName(e.target.value)} placeholder="RUNNING FROM OUR PROBLEMS" />
       </Field>
       {!initial ? (

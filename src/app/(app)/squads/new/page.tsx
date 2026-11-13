@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: "New squad" };
 export default function NewSquadPage() {
   return (
     <Page className="max-w-2xl">
-      <PageHeader label="// new squad" title="Assemble." sub="You'll be the admin. Squads unlock leaderboards and challenges once 3 people are in (max 10)." />
+      <PageHeader label="new squad" title="Assemble." sub="You'll be the admin. Squads unlock leaderboards and challenges once 3 people are in (max 10)." />
       <Card>
         <SquadForm />
       </Card>

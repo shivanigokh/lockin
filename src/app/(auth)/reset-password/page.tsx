@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "New password" };
 export default function ResetPasswordPage() {
   return (
     <>
-      <p className="label-mono mb-2">// fresh start</p>
+      <p className="label-mono mb-2">fresh start</p>
       <h1 className="display mb-8 text-5xl">New password.</h1>
       <AuthForm action={updatePassword} submit="Save password">
         <Field label="New password" htmlFor="password" hint="8+ characters.">

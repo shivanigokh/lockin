@@ -1,6 +1,6 @@
 import { cn, initials } from "@/lib/utils";
 
-const palette = ["#c8ff2e", "#ff6ec7", "#b8a6ff", "#ff9b45", "#5be4ea"];
+const palette = ["#979aff", "#ff6b57", "#c6c7ff", "#ff9a6b", "#7fd3e6"];
 
 function hash(s: string) {
   let h = 0;
@@ -38,7 +38,7 @@ export function Avatar({
   return (
     <span
       aria-label={name}
-      className={cn("inline-flex shrink-0 items-center justify-center rounded-full font-mono font-bold text-black", className)}
+      className={cn("inline-flex shrink-0 items-center justify-center rounded-full font-semibold text-[#141218]", className)}
       style={{ width: size, height: size, background: bg, fontSize: Math.max(10, size * 0.36) }}
     >
       {initials(name) || "?"}

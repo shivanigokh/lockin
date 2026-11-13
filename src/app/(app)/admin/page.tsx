@@ -50,7 +50,7 @@ export default async function AdminPage() {
 
   return (
     <Page>
-      <PageHeader label="// owner only" title="Usage" sub="How many people are locking in, and which squads exist. No emails, health data, goals or messages.">
+      <PageHeader label="owner only" title="Usage" sub="How many people are using nudge, and which squads exist. No emails, health data, goals or messages.">
         <Badge color="var(--color-lime)">
           <ShieldCheck className="h-3 w-3" /> admin
         </Badge>
@@ -60,7 +60,7 @@ export default async function AdminPage() {
         {tiles.map(([label, value, color, sub]) => (
           <div key={label} className="card p-4">
             <div className="label-mono text-[10px]">{label}</div>
-            <div className="mt-1 font-display text-4xl font-black tabular-nums" style={{ color }}>
+            <div className="mt-1 font-display text-4xl font-bold tabular-nums" style={{ color }}>
               {value}
             </div>
             {sub ? <div className="mt-1 text-xs text-muted">{sub}</div> : null}

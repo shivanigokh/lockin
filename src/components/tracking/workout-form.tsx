@@ -69,7 +69,7 @@ export function WorkoutForm({
               aria-pressed={type === a.value}
               className={cn(
                 "flex flex-col items-center gap-1 rounded-xl border px-1 py-2.5 text-xs font-semibold transition cursor-pointer sm:rounded-2xl sm:py-3",
-                type === a.value ? "border-transparent text-black" : "border-transparent bg-surface-2 text-muted hover:text-ink",
+                type === a.value ? "border-transparent text-[#141218]" : "border-transparent bg-surface-2 text-muted hover:text-ink",
               )}
               style={type === a.value ? { background: a.color } : undefined}
             >
@@ -167,7 +167,7 @@ export function WorkoutForm({
         </button>
       )}
 
-      <div className="sticky bottom-0 -mx-5 -mb-5 bg-surface px-5 pt-2 pb-5 sm:static sm:m-0 sm:p-0">
+      <div className="sticky bottom-0 -mx-5 -mb-5 bg-gradient-to-t from-sheet via-sheet/95 to-transparent px-5 pt-4 pb-5 sm:static sm:m-0 sm:bg-none sm:p-0">
         <Button type="submit" size="lg" className="w-full" loading={pending}>
           {initial ? "Save changes" : "Log it"}
         </Button>

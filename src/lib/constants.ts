@@ -101,7 +101,7 @@ export const AWARDS: Record<string, { label: string; blurb: string; icon: Lucide
 };
 
 export const COPY = {
-  tagline: "LESS TALK. MORE ACTION.",
+  tagline: "Less talk. More action.",
   leaderboard: "Your body is not a leaderboard.",
   couch: "Be less of a couch creature.",
   hydrated: "Hydrated? Emotionally? Physically? Unclear.",

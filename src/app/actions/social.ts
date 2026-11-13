@@ -10,7 +10,7 @@ export async function postMessage(groupId: string, body: string): Promise<Action
   const user = await requireUser();
   const text = body.trim();
   if (!text) return errResult("Say something.");
-  if (text.length > 280) return errResult("280 characters max. LESS TALK.");
+  if (text.length > 280) return errResult("280 characters max. Less talk.");
   const supabase = await createClient();
   const { error } = await supabase.from("group_activity").insert({ group_id: groupId, actor_id: user.id, kind: "message", body: text });
   if (error) return errResult(friendlyError(error));

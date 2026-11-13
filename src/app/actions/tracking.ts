@@ -113,7 +113,7 @@ export async function saveWorkout(id: string | null, input: z.input<typeof worko
     if (error) return errResult(friendlyError(error));
   }
   revalidatePath("/", "layout");
-  const lines = ["Logged. Couch creature: defeated.", "Logged. The squad has been notified.", "Logged. LESS TALK. MORE ACTION.", "Logged. Your future self says thanks."];
+  const lines = ["Logged. Couch creature: defeated.", "Logged. The squad has been notified.", "Logged. Less talk, more action.", "Logged. Your future self says thanks."];
   return okResult(id ? "Workout updated." : lines[Math.floor(Math.random() * lines.length)]);
 }
 

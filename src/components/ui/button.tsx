@@ -6,17 +6,17 @@ type Variant = "primary" | "secondary" | "ghost" | "danger" | "pink";
 type Size = "sm" | "md" | "lg" | "icon";
 
 const variants: Record<Variant, string> = {
-  primary: "bg-lime text-black hover:bg-[#d6ff5c] active:translate-y-px shadow-[0_0_0_0_rgba(200,255,46,0)] hover:shadow-[0_0_24px_-6px_rgba(200,255,46,0.6)]",
-  secondary: "bg-surface-2 text-ink border border-line hover:border-faint hover:bg-surface-3",
-  ghost: "text-muted hover:text-ink hover:bg-surface-2",
+  primary: "bg-gradient-to-b from-[#a9abff] to-[#8689f5] text-[#141218] shadow-[0_8px_24px_-10px_rgba(117,121,224,0.9),inset_0_1px_0_rgba(255,255,255,0.45)] hover:brightness-105 active:scale-[0.98]",
+  secondary: "bg-white/[0.08] text-ink border border-white/10 backdrop-blur-xl hover:bg-white/[0.12] active:scale-[0.98]",
+  ghost: "text-muted hover:text-ink hover:bg-white/[0.07]",
   danger: "bg-danger/10 text-danger border border-danger/30 hover:bg-danger/20",
-  pink: "bg-pink text-black hover:brightness-110",
+  pink: "bg-gradient-to-b from-[#ff8a78] to-[#e94b3c] text-white hover:brightness-105 active:scale-[0.98]",
 };
 const sizes: Record<Size, string> = {
-  sm: "h-8 px-3 text-xs rounded-lg gap-1.5",
-  md: "h-10 px-4 text-sm rounded-xl gap-2",
-  lg: "h-12 px-6 text-base rounded-2xl gap-2",
-  icon: "h-9 w-9 rounded-xl",
+  sm: "h-9 px-3.5 text-[13px] rounded-full gap-1.5",
+  md: "h-11 px-5 text-[15px] rounded-full gap-2",
+  lg: "h-[52px] px-6 text-[16px] rounded-full gap-2",
+  icon: "h-10 w-10 rounded-full",
 };
 
 export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
