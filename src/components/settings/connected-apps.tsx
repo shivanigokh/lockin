@@ -31,10 +31,13 @@ export function ConnectedApps({ strava, stravaReady, ingestKey, ingestUrl, short
 
   return (
     <div className="space-y-6">
-      <StravaPanel strava={strava} ready={stravaReady} />
-      <div className="border-t border-line/60 pt-5">
-        <AppleHealthPanel ingestKey={ingestKey} ingestUrl={ingestUrl} shortcutUrl={shortcutUrl} />
-      </div>
+      <AppleHealthPanel ingestKey={ingestKey} ingestUrl={ingestUrl} shortcutUrl={shortcutUrl} />
+      {/* Strava's API now needs a paid Strava subscription; the panel only shows once keys are configured. */}
+      {stravaReady || strava ? (
+        <div className="border-t border-line/60 pt-5">
+          <StravaPanel strava={strava} ready={stravaReady} />
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -123,7 +126,7 @@ function AppleHealthPanel({ ingestKey, ingestUrl, shortcutUrl }: { ingestKey: Ke
         <h3 className="font-semibold">Apple Health</h3>
       </div>
       <p className="text-sm text-muted">
-        Sends your <b>daily calories</b> from Apple Health to your private vault. Works with food apps that write to Apple Health (MyFitnessPal, Cronometer, Lose It!, Yazio). Your iPhone asks before anything is added or shared.
+        Brings your <b>iPhone and Apple Watch workouts</b> in automatically, including ones other apps (Strava, Nike Run Club, gym apps) save to Apple Health. Your iPhone asks before anything is read or sent.
       </p>
 
       {shortcutUrl ? (
@@ -156,7 +159,7 @@ function AppleHealthPanel({ ingestKey, ingestUrl, shortcutUrl }: { ingestKey: Ke
             </a>
           </Step>
           <Step n={3} title="Run it once">
-            <p className="text-xs text-faint">iPhone asks to let it read Dietary Energy and talk to this site. Tap <b>Allow</b> for both.</p>
+            <p className="text-xs text-faint">iPhone asks to let it read your workouts and talk to this site. Tap <b>Allow</b> for both.</p>
             <a href={`shortcuts://run-shortcut?name=${encodeURIComponent(SHORTCUT_NAME)}`} className="mt-2 inline-flex h-9 items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.08] px-3.5 text-[13px] font-semibold text-ink transition hover:bg-white/[0.12]">
               <RefreshCw className="h-4 w-4" /> Sync now
             </a>
@@ -188,28 +191,28 @@ function AppleHealthPanel({ ingestKey, ingestUrl, shortcutUrl }: { ingestKey: Ke
       <details className="mt-4 rounded-xl border border-line/70 p-3 text-sm">
         <summary className="cursor-pointer font-semibold">{shortcutUrl ? "Build the Shortcut yourself instead" : "How to set up the Shortcut"}</summary>
         <ol className="mt-3 list-decimal space-y-2 pl-5 text-muted">
-          <li>Open <b>Shortcuts</b> on your iPhone, tap <b>+</b> to make a new shortcut, name it “{SHORTCUT_NAME}”.</li>
+          <li>Open <b>Shortcuts</b>, tap <b>+</b>, name it “{SHORTCUT_NAME}”.</li>
           <li>
-            Add <b>Find Health Samples</b>: Type <b>Dietary Energy</b>, Start Date <b>is today</b>. Then <b>Calculate Statistics</b>: <b>Sum</b>.
+            <b>Find Health Samples</b>: Type <b>Workouts</b>, Start Date <b>is in the last 2 days</b>.
           </li>
           <li>
-            Add <b>Get Contents of URL</b> with URL{" "}
+            <b>Repeat with Each</b> item in Health Samples. Inside the repeat: <b>Get Time Between Dates</b> (Repeat Item&apos;s Start Date &rarr; End Date, in <b>Minutes</b>), and <b>Format Date</b> (Repeat Item&apos;s Start Date, <b>ISO 8601</b>, with time).
+          </li>
+          <li>
+            Still inside: <b>Get Contents of URL</b>{" "}
             <code className="break-all rounded bg-white/10 px-1 font-mono text-xs">{ingestUrl}</code>
             <button type="button" className="ml-1 text-lavender underline" onClick={() => copy(ingestUrl)}>
               copy
             </button>
-            . Method <b>POST</b>, Headers: <code className="font-mono text-xs">Authorization</code> = <code className="font-mono text-xs">Bearer &lt;your key&gt;</code>. Request Body <b>JSON</b> with <code className="font-mono text-xs">calories</code> (Number) = the Statistics result, and <code className="font-mono text-xs">date</code> (Text) = <b>Current Date</b> formatted as <b>ISO 8601</b>, date only.
+            , Method <b>POST</b>, Request Body <b>JSON</b>: <code className="font-mono text-xs">key</code> = your sync key, <code className="font-mono text-xs">type</code> = Repeat Item&apos;s type, <code className="font-mono text-xs">duration_min</code> = Time Between Dates, <code className="font-mono text-xs">start</code> = Formatted Date, and optionally <code className="font-mono text-xs">distance_km</code>.
           </li>
           <li>
-            In the <b>Automation</b> tab, make a <b>Time of Day</b> automation (say 10 pm, daily, <b>Run Immediately</b>) that runs “{SHORTCUT_NAME}”. Running it again the same day just updates that day&apos;s total.
-          </li>
-          <li>
-            Optional workouts: send <code className="font-mono text-xs">type</code> (e.g. “Running”), <code className="font-mono text-xs">duration_min</code>, <code className="font-mono text-xs">distance_km</code> and <code className="font-mono text-xs">start</code> (ISO 8601) in the same way. Skip this if you already use Strava, or workouts will count twice.
+            <b>Automation</b> tab &rarr; <b>Time of Day</b>, 10 pm, Daily, <b>Run Immediately</b> &rarr; “{SHORTCUT_NAME}”. Workouts never import twice, so running it often is fine.
           </li>
         </ol>
       </details>
       <p className="mt-3 text-xs text-faint">
-        Using HealthifyMe? It doesn&apos;t share calories with Apple Health, so type the day&apos;s total into the &ldquo;Calories today&rdquo; box on your squad page instead.
+        Calories: type the day&apos;s total from your food app into the &ldquo;Calories today&rdquo; box on your squad page.
       </p>
     </div>
   );

@@ -39,6 +39,15 @@ describe("ingest normalisation", () => {
     expect(normaliseIngest({ calories: 100, date: "16 Nov 2026" }, today).errors[0]).toMatch(/ISO/);
   });
 
+  it("accepts one workout per request the way the Shortcut loop sends it, and skips empty calorie days", () => {
+    const today = "2026-11-16";
+    const { items } = normaliseIngest({ key: "nk_x", type: "Outdoor Run", duration_min: "32", start: "2026-11-16T06:40:00+05:30" }, today);
+    expect(items).toEqual([
+      { kind: "workout", activity_type: "running", date: today, duration_min: 32, distance_km: null, external_id: "2026-11-16T06:40:00+05:30|running|32" },
+    ]);
+    expect(normaliseIngest({ calories: 0, date: today }, today)).toEqual({ items: [], errors: [] });
+  });
+
   it("turns a Strava activity into a workout row", () => {
     expect(
       stravaToWorkout({ id: 123, name: "Morning Run", sport_type: "Run", start_date_local: "2026-11-16T06:10:00Z", moving_time: 1800, distance: 5012.3 }),

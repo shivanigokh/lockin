@@ -129,6 +129,7 @@ export function normaliseIngest(body: unknown, today: string): { items: IngestIt
     if (kind === "calories") {
       const calories = parseCalories(pick(o, "calories", "dietary_energy", "kcal"));
       if (calories === null) return void errors.push(`Item ${i + 1}: calories must be a number.`);
+      if (calories === 0) return; // nothing logged in Health that day; don't overwrite with 0
       items.push({ kind: "calories", date, calories });
       return;
     }
