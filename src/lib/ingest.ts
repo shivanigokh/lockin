@@ -92,7 +92,9 @@ export type WorkoutItem = {
   external_id: string;
 };
 export type CaloriesItem = { kind: "calories"; date: string; calories: number };
-export type IngestItem = WorkoutItem | CaloriesItem;
+export type ExerciseItem = { kind: "exercise"; date: string; minutes: number };
+export type ActiveEnergyItem = { kind: "active_energy"; date: string; kcal: number };
+export type IngestItem = WorkoutItem | CaloriesItem | ExerciseItem | ActiveEnergyItem;
 
 type Loose = Record<string, unknown>;
 const pick = (o: Loose, ...keys: string[]) => keys.map((k) => o[k]).find((v) => v !== undefined && v !== null && v !== "");
@@ -121,15 +123,32 @@ export function normaliseIngest(body: unknown, today: string): { items: IngestIt
   raw.forEach((r, i) => {
     if (!r || typeof r !== "object") return void errors.push(`Item ${i + 1}: not an object.`);
     const o = r as Loose;
-    const kind = String(o.kind ?? (pick(o, "calories", "dietary_energy", "kcal") !== undefined ? "calories" : "workout"));
     const date = parseDay(pick(o, "date", "start", "start_date", "startDate"), today);
     if (!date) return void errors.push(`Item ${i + 1}: use an ISO date like 2026-11-16 (format the date as ISO 8601 in Shortcuts).`);
     if (date > today) return void errors.push(`Item ${i + 1}: date is in the future.`);
 
-    if (kind === "calories") {
-      const calories = parseCalories(pick(o, "calories", "dietary_energy", "kcal"));
-      if (calories === null) return void errors.push(`Item ${i + 1}: calories must be a number.`);
-      items.push({ kind: "calories", date, calories });
+    // Daily totals. One object may carry several (the Shortcut sends
+    // exercise_minutes and active_kcal together).
+    const exercise = pick(o, "exercise_minutes", "exercise_min");
+    const active = pick(o, "active_kcal", "active_energy", "calories_burned");
+    const eaten = pick(o, "calories", "dietary_energy", "kcal");
+    const daily = o.kind === "exercise" || o.kind === "active_energy" || o.kind === "calories" || exercise !== undefined || active !== undefined || eaten !== undefined;
+    if (daily) {
+      if (exercise !== undefined || o.kind === "exercise") {
+        const m = parseCalories(exercise ?? o.minutes); // same rules: a plain non-negative number
+        if (m === null || m > 1440) errors.push(`Item ${i + 1}: exercise minutes must be a number.`);
+        else if (m >= 1) items.push({ kind: "exercise", date, minutes: m });
+      }
+      if (active !== undefined || o.kind === "active_energy") {
+        const k = parseCalories(active ?? o.kcal);
+        if (k === null) errors.push(`Item ${i + 1}: active energy must be a number.`);
+        else if (k >= 1) items.push({ kind: "active_energy", date, kcal: k });
+      }
+      if (eaten !== undefined && o.kind !== "active_energy") {
+        const c = parseCalories(eaten);
+        if (c === null) errors.push(`Item ${i + 1}: calories must be a number.`);
+        else if (c >= 1) items.push({ kind: "calories", date, calories: c }); // 0 = nothing logged; don't overwrite
+      }
       return;
     }
 
