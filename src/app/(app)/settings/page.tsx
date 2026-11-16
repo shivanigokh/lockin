@@ -8,12 +8,16 @@ import { PendingInvites } from "@/components/squads/pending-invites";
 import { AuthForm } from "@/app/(auth)/auth-form";
 import { Field, Input } from "@/components/ui/field";
 import { updatePassword } from "@/app/actions/auth";
+import { ConnectedApps } from "@/components/settings/connected-apps";
+import { stravaConfigured } from "@/lib/strava";
+import { SITE_URL } from "@/lib/env";
 
 export const metadata: Metadata = { title: "Settings" };
 
 const SECTIONS = [
   ["profile", "Profile"],
   ["habits", "Habits"],
+  ["connected-apps", "Connected apps"],
   ["privacy", "Privacy"],
   ["notifications", "Notifications"],
   ["squads", "Squads"],
@@ -22,12 +26,14 @@ const SECTIONS = [
   ["account", "Account"],
 ] as const;
 
-export default async function SettingsPage() {
-  const [me, groups] = await Promise.all([getMe(), getMyGroups()]);
+export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ strava?: string }> }) {
+  const [me, groups, { strava: stravaStatus }] = await Promise.all([getMe(), getMyGroups(), searchParams]);
   const supabase = await createClient();
-  const [{ data: habits }, { data: invites }] = await Promise.all([
+  const [{ data: habits }, { data: invites }, { data: strava }, { data: ingestKey }] = await Promise.all([
     supabase.from("daily_habits").select("id, name, icon, visible_to_groups, archived").eq("user_id", me.user.id).order("sort_order"),
     supabase.rpc("my_pending_invites"),
+    supabase.from("strava_connections").select("athlete_name, last_synced_at").eq("user_id", me.user.id).maybeSingle(),
+    supabase.from("ingest_tokens").select("created_at, last_used_at").eq("user_id", me.user.id).maybeSingle(),
   ]);
 
   return (
@@ -48,6 +54,10 @@ export default async function SettingsPage() {
         <Card id="habits" className="scroll-mt-28">
           <CardHeader label="daily habits" title="Your checklist" />
           <HabitManager habits={habits ?? []} />
+        </Card>
+        <Card id="connected-apps" className="scroll-mt-28">
+          <CardHeader label="connected apps" title="Sync workouts & calories" />
+          <ConnectedApps strava={strava} stravaReady={stravaConfigured()} ingestKey={ingestKey} ingestUrl={`${SITE_URL}/api/ingest`} status={stravaStatus} />
         </Card>
         <Card id="privacy" className="scroll-mt-28">
           <CardHeader label="privacy & preferences" title="What squads can see" />

@@ -7,7 +7,8 @@ import { Page, PageHeader } from "@/components/page-header";
 import { Card, CardHeader } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { HabitTrendChart, MeasurementChart, WeeklyWorkoutsChart, WeightChart } from "@/components/charts/health-charts";
+import { CaloriesChart, HabitTrendChart, MeasurementChart, WeeklyWorkoutsChart, WeightChart } from "@/components/charts/health-charts";
+import { CalorieTargetForm, MealForm, MealList } from "@/components/health/food-forms";
 import { HealthProfileForm, MeasurementForm, MeasurementTable, NotesPanel, WeightForm, WeightList } from "@/components/health/health-forms";
 import { ACTIVITIES } from "@/lib/constants";
 import { cmTo, kgTo, round1, type LengthUnit, type WeightUnit } from "@/lib/units";
@@ -26,7 +27,8 @@ export default async function MyHealthPage() {
   const thirtyAgo = iso(addDays(parseISO(today), -29));
   const month = monthRange(today);
 
-  const [hp, weights, measurements, notes, workouts, habits, completions, goals] = await Promise.all([
+  const fourteenAgo = iso(addDays(parseISO(today), -13));
+  const [hp, weights, measurements, notes, workouts, habits, completions, goals, meals] = await Promise.all([
     supabase.from("private_health_profiles").select("*").eq("user_id", me.user.id).maybeSingle(),
     supabase.from("weight_entries").select("id, entry_date, weight_kg").eq("user_id", me.user.id).order("entry_date", { ascending: false }).limit(400),
     supabase.from("body_measurements").select("*").eq("user_id", me.user.id).order("measured_on", { ascending: false }).limit(200),
@@ -35,9 +37,10 @@ export default async function MyHealthPage() {
     supabase.from("daily_habits").select("id").eq("user_id", me.user.id).eq("archived", false),
     supabase.from("habit_completions").select("completed_on, habit_id").eq("user_id", me.user.id).gte("completed_on", thirtyAgo),
     supabase.rpc("my_goals", { p_today: today }),
+    supabase.from("meal_entries").select("id, eaten_on, meal, name, calories, protein_g, source").eq("user_id", me.user.id).gte("eaten_on", fourteenAgo).order("eaten_on", { ascending: false }).order("created_at", { ascending: false }),
   ]);
 
-  const profile = hp.data ?? { height_cm: null, starting_weight_kg: null, target_weight_kg: null, health_goals: null };
+  const profile = hp.data ?? { height_cm: null, starting_weight_kg: null, target_weight_kg: null, health_goals: null, calorie_target: null };
   const w = (weights.data ?? []).map((x) => ({ ...x, weight_kg: Number(x.weight_kg) }));
   const current = w[0]?.weight_kg ?? null;
   const start = profile.starting_weight_kg != null ? Number(profile.starting_weight_kg) : (w.at(-1)?.weight_kg ?? null);
@@ -73,6 +76,17 @@ export default async function MyHealthPage() {
   (completions.data ?? []).forEach((c) => activeHabitIds.has(c.habit_id) && perDay.set(c.completed_on, (perDay.get(c.completed_on) ?? 0) + 1));
   const habitTrend = daysBetween(thirtyAgo, today).map((d) => ({ date: d, pct: habitTotal ? Math.round(((perDay.get(d) ?? 0) / habitTotal) * 100) : 0 }));
   const habitAvg = habitTrend.length ? Math.round(habitTrend.reduce((s, x) => s + x.pct, 0) / habitTrend.length) : 0;
+
+  // food: last 14 days (private, never leaves this page)
+  const mealRows = meals.data ?? [];
+  const kcalByDay = new Map<string, number>();
+  mealRows.forEach((m) => kcalByDay.set(m.eaten_on, (kcalByDay.get(m.eaten_on) ?? 0) + m.calories));
+  const kcalChart = daysBetween(fourteenAgo, today).map((d) => ({ date: d, kcal: kcalByDay.get(d) ?? 0 }));
+  const kcalToday = kcalByDay.get(today) ?? 0;
+  const loggedDays = kcalChart.filter((d) => d.kcal > 0);
+  const kcalAvg = loggedDays.length ? Math.round(loggedDays.reduce((s, d) => s + d.kcal, 0) / loggedDays.length) : null;
+  const kcalTarget = profile.calorie_target ?? null;
+  const weekAgo = iso(addDays(parseISO(today), -6));
 
   const goalData = (goals.data ?? []).filter((g) => !g.archived).map((g) => ({ name: g.title, pct: g.pct }));
 
@@ -120,6 +134,40 @@ export default async function MyHealthPage() {
         <Card>
           <CardHeader label="check-ins" title="Weigh-ins" />
           <WeightList entries={w} wu={wu} />
+        </Card>
+      </div>
+
+      <h2 className="display mb-3 mt-8 text-2xl sm:mb-4 sm:mt-10 sm:text-3xl">Food</h2>
+      <div className="grid gap-4 sm:gap-5 lg:grid-cols-[1.5fr_1fr]">
+        <Card>
+          <CardHeader
+            label="calories · 14 days"
+            title={`${fmtNum(kcalToday, 0)} kcal today`}
+            action={kcalAvg != null ? <Badge color="var(--color-cyan)">avg {fmtNum(kcalAvg, 0)}</Badge> : null}
+          />
+          {kcalTarget ? (
+            <div className="mb-4">
+              <div className="mb-1 flex justify-between font-mono text-xs text-muted">
+                <span>today vs target {fmtNum(kcalTarget, 0)}</span>
+                <span className="text-cyan">{Math.round((kcalToday / kcalTarget) * 100)}%</span>
+              </div>
+              <ProgressBar value={Math.min(100, (kcalToday / kcalTarget) * 100)} color="var(--color-cyan)" />
+            </div>
+          ) : null}
+          <CaloriesChart data={kcalChart} target={kcalTarget} />
+          <div className="mt-4 border-t border-line/60 pt-4 sm:mt-5 sm:pt-5">
+            <MealForm today={today} />
+          </div>
+        </Card>
+        <Card>
+          <CardHeader label="log" title="This week" />
+          <MealList entries={mealRows.filter((m) => m.eaten_on >= weekAgo)} />
+          <div className="mt-4 border-t border-line/60 pt-4">
+            <CalorieTargetForm target={kcalTarget} />
+            <p className="mt-2 text-xs text-faint">
+              Synced from HealthifyMe or another food app? Set up the Apple Health Shortcut in <a href="/settings#connected-apps" className="underline">Settings</a>.
+            </p>
+          </div>
         </Card>
       </div>
 

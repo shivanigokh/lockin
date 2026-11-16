@@ -363,6 +363,46 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"ingest_tokens": {
+                  Row: {
+                    "created_at": string,"last_used_at": string | null,"token_hash": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"last_used_at"?: string | null,"token_hash": string,"user_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"last_used_at"?: string | null,"token_hash"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "ingest_tokens_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: true
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"meal_entries": {
+                  Row: {
+                    "calories": number,"carbs_g": number | null,"created_at": string,"eaten_on": string,"external_id": string | null,"fat_g": number | null,"id": string,"meal": string,"name": string | null,"protein_g": number | null,"source": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "calories": number,"carbs_g"?: number | null,"created_at"?: string,"eaten_on": string,"external_id"?: string | null,"fat_g"?: number | null,"id"?: string,"meal"?: string,"name"?: string | null,"protein_g"?: number | null,"source"?: string,"user_id": string
+                  }
+                  Update: {
+                    "calories"?: number,"carbs_g"?: number | null,"created_at"?: string,"eaten_on"?: string,"external_id"?: string | null,"fat_g"?: number | null,"id"?: string,"meal"?: string,"name"?: string | null,"protein_g"?: number | null,"source"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "meal_entries_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"notifications": {
                   Row: {
                     "body": string | null,"created_at": string,"id": string,"kind": string,"link": string | null,"read_at": string | null,"title": string,"user_id": string
@@ -405,14 +445,14 @@ isOneToOne: false
                   ]
                 },"private_health_profiles": {
                   Row: {
-                    "health_goals": string | null,"height_cm": number | null,"starting_weight_kg": number | null,"target_weight_kg": number | null,"updated_at": string,"user_id": string
+                    "calorie_target": number | null,"health_goals": string | null,"height_cm": number | null,"starting_weight_kg": number | null,"target_weight_kg": number | null,"updated_at": string,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "health_goals"?: string | null,"height_cm"?: number | null,"starting_weight_kg"?: number | null,"target_weight_kg"?: number | null,"updated_at"?: string,"user_id": string
+                    "calorie_target"?: number | null,"health_goals"?: string | null,"height_cm"?: number | null,"starting_weight_kg"?: number | null,"target_weight_kg"?: number | null,"updated_at"?: string,"user_id": string
                   }
                   Update: {
-                    "health_goals"?: string | null,"height_cm"?: number | null,"starting_weight_kg"?: number | null,"target_weight_kg"?: number | null,"updated_at"?: string,"user_id"?: string
+                    "calorie_target"?: number | null,"health_goals"?: string | null,"height_cm"?: number | null,"starting_weight_kg"?: number | null,"target_weight_kg"?: number | null,"updated_at"?: string,"user_id"?: string
                   }
                   Relationships: [
                     {
@@ -469,6 +509,26 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"strava_connections": {
+                  Row: {
+                    "access_token": string,"athlete_id": number,"athlete_name": string | null,"created_at": string,"expires_at": string,"last_synced_at": string | null,"refresh_token": string,"scope": string | null,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "access_token": string,"athlete_id": number,"athlete_name"?: string | null,"created_at"?: string,"expires_at": string,"last_synced_at"?: string | null,"refresh_token": string,"scope"?: string | null,"user_id": string
+                  }
+                  Update: {
+                    "access_token"?: string,"athlete_id"?: number,"athlete_name"?: string | null,"created_at"?: string,"expires_at"?: string,"last_synced_at"?: string | null,"refresh_token"?: string,"scope"?: string | null,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "strava_connections_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: true
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"user_settings": {
                   Row: {
                     "default_workout_visibility": Database["public"]['Enums']["workout_visibility"],"length_unit": string,"notify_challenges": boolean,"notify_invites": boolean,"notify_reactions": boolean,"notify_squad_joins": boolean,"share_habits": boolean,"timezone": string,"updated_at": string,"user_id": string,"weight_unit": string
@@ -511,14 +571,14 @@ isOneToOne: false
                   ]
                 },"workouts": {
                   Row: {
-                    "activity_type": Database["public"]['Enums']["activity_type"],"created_at": string,"distance_km": number | null,"duration_min": number,"id": string,"note": string | null,"performed_on": string,"updated_at": string,"user_id": string,"visibility": Database["public"]['Enums']["workout_visibility"],"workout_payload": Json | null
+                    "activity_type": Database["public"]['Enums']["activity_type"],"created_at": string,"distance_km": number | null,"duration_min": number,"external_id": string | null,"id": string,"note": string | null,"performed_on": string,"source": string,"updated_at": string,"user_id": string,"visibility": Database["public"]['Enums']["workout_visibility"],"workout_payload": Json | null
                   }
                   ComputedFields: "workout_payload"
                   Insert: {
-                    "activity_type": Database["public"]['Enums']["activity_type"],"created_at"?: string,"distance_km"?: number | null,"duration_min": number,"id"?: string,"note"?: string | null,"performed_on": string,"updated_at"?: string,"user_id": string,"visibility"?: Database["public"]['Enums']["workout_visibility"]
+                    "activity_type": Database["public"]['Enums']["activity_type"],"created_at"?: string,"distance_km"?: number | null,"duration_min": number,"external_id"?: string | null,"id"?: string,"note"?: string | null,"performed_on": string,"source"?: string,"updated_at"?: string,"user_id": string,"visibility"?: Database["public"]['Enums']["workout_visibility"]
                   }
                   Update: {
-                    "activity_type"?: Database["public"]['Enums']["activity_type"],"created_at"?: string,"distance_km"?: number | null,"duration_min"?: number,"id"?: string,"note"?: string | null,"performed_on"?: string,"updated_at"?: string,"user_id"?: string,"visibility"?: Database["public"]['Enums']["workout_visibility"]
+                    "activity_type"?: Database["public"]['Enums']["activity_type"],"created_at"?: string,"distance_km"?: number | null,"duration_min"?: number,"external_id"?: string | null,"id"?: string,"note"?: string | null,"performed_on"?: string,"source"?: string,"updated_at"?: string,"user_id"?: string,"visibility"?: Database["public"]['Enums']["workout_visibility"]
                   }
                   Relationships: [
                     {
@@ -599,6 +659,9 @@ isOneToOne: false
                            },
 "habit_visible_to_caller":
 { Args: { "p_habit": string }; Returns: boolean
+                           },
+"ingest_health_items":
+{ Args: { "p_items": Json,"p_token": string }; Returns: Json
                            },
 "invite_user":
 { Args: { "p_group": string,"p_username": string }; Returns: undefined

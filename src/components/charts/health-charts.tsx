@@ -85,3 +85,21 @@ export function MeasurementChart({ data, keys }: { data: Record<string, number |
     </div>
   );
 }
+
+export function CaloriesChart({ data, target }: { data: { date: string; kcal: number }[]; target: number | null }) {
+  if (!data.some((d) => d.kcal > 0)) return <p className="py-8 text-center text-sm text-muted">Log some food to see your last two weeks.</p>;
+  return (
+    <div className="h-44 sm:h-56">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={data} margin={{ left: -12, right: 4, top: 8, bottom: 0 }}>
+          <CartesianGrid stroke="#2c2c31" strokeDasharray="3 3" vertical={false} />
+          <XAxis dataKey="date" tickFormatter={short} {...axis} minTickGap={16} />
+          <YAxis allowDecimals={false} {...axis} width={52} />
+          <Tooltip {...chartTooltip} labelFormatter={(l) => short(String(l))} formatter={(v) => [`${v} kcal`, "eaten"]} />
+          {target ? <ReferenceLine y={target} stroke="#ff6b57" strokeDasharray="6 4" label={{ value: "target", fill: "#ff6b57", fontSize: 11, position: "insideTopRight" }} /> : null}
+          <Bar dataKey="kcal" fill="#7fd3e6" radius={[6, 6, 0, 0]} />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}

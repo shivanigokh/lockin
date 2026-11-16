@@ -499,3 +499,52 @@ describe("one log, every squad", () => {
     }
   });
 });
+
+describe("integrations: Strava, Apple Health sync key, food log", () => {
+  const sha256 = async (s: string) =>
+    Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s))))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+  const anon = () => createClient(URL, ANON, { auth: { persistSession: false, autoRefreshToken: false } });
+
+  it("food entries, Strava tokens and sync keys are owner-only", async () => {
+    const [P, Q] = await Promise.all(["vault_v", "vault_w"].map(makeUser));
+    ok(await P.c.from("meal_entries").insert({ user_id: P.id, eaten_on: today, meal: "lunch", name: "secret biryani", calories: 812 }));
+    ok(await P.c.from("strava_connections").insert({ user_id: P.id, athlete_id: 42, access_token: "at", refresh_token: "rt", expires_at: new Date().toISOString() }));
+    ok(await P.c.from("ingest_tokens").insert({ user_id: P.id, token_hash: await sha256(`x_${run}_${"x".repeat(40)}`) }));
+
+    for (const t of ["meal_entries", "strava_connections", "ingest_tokens"] as const) {
+      expect(ok(await P.c.from(t).select("user_id"))).toHaveLength(1);
+      expect(ok(await Q.c.from(t).select("user_id").eq("user_id", P.id))).toEqual([]);
+      expect((await anon().from(t).select("user_id")).data ?? []).toEqual([]);
+    }
+    // can't write into someone else's vault
+    const r = await Q.c.from("meal_entries").insert({ user_id: P.id, eaten_on: today, calories: 1 });
+    expect(r.error).toBeTruthy();
+  });
+
+  it("the sync key ingests workouts and calories for its owner only, without a session", async () => {
+    const [P, Q] = await Promise.all(["sync_s", "sync_t"].map(makeUser));
+    const key = `nk_${run}_${"k".repeat(40)}`;
+    ok(await P.c.from("ingest_tokens").insert({ user_id: P.id, token_hash: await sha256(key) }));
+    const items = [
+      { kind: "workout", activity_type: "running", date: today, duration_min: 31, distance_km: 5.2, external_id: `run-${run}` },
+      { kind: "calories", date: today, calories: 1700 },
+    ];
+    const res = ok(await anon().rpc("ingest_health_items", { p_token: key, p_items: items })) as { workouts_added: number };
+    expect(res.workouts_added).toBe(1);
+    // re-sending is idempotent; calories for a day are replaced, not added
+    ok(await anon().rpc("ingest_health_items", { p_token: key, p_items: [items[0], { kind: "calories", date: today, calories: 1950 }] }));
+    const ws = ok(await P.c.from("workouts").select("source, duration_min").eq("user_id", P.id)) as { source: string }[];
+    expect(ws).toEqual([{ source: "apple_health", duration_min: 31 }]);
+    const meals = ok(await P.c.from("meal_entries").select("calories, meal").eq("user_id", P.id));
+    expect(meals).toEqual([{ calories: 1950, meal: "day_total" }]);
+    // nobody else sees the calories
+    expect(ok(await Q.c.from("meal_entries").select("id").eq("user_id", P.id))).toEqual([]);
+
+    const bad = await anon().rpc("ingest_health_items", { p_token: "y".repeat(40), p_items: items });
+    expect(bad.error?.code).toBe("28000");
+    // the anon role still can't touch tables directly
+    expect((await anon().from("workouts").insert({ user_id: P.id, activity_type: "running", performed_on: today, duration_min: 5 })).error).toBeTruthy();
+  });
+});
