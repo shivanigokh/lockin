@@ -14,6 +14,7 @@ import { Composer, FeedList } from "@/components/feed/feed";
 import { InviteLink } from "@/components/squad/invite-panel";
 import { SquadBadge } from "@/components/shell/squad-switcher";
 import { MyTodayWorkouts } from "@/components/tracking/my-today-workouts";
+import { QuickCalories } from "@/components/health/quick-calories";
 import { COPY, MIN_MEMBERS } from "@/lib/constants";
 import { displayName } from "@/lib/utils";
 import { prettyDate } from "@/lib/dates";
@@ -28,7 +29,7 @@ export default async function GroupDashboard({ params }: { params: Promise<{ gro
   const supabase = await createClient();
   const today = me.today;
 
-  const [habits, squadToday, board, feed, challenges, myWorkouts, code] = await Promise.all([
+  const [habits, squadToday, board, feed, challenges, myWorkouts, code, myMeals, myHealth] = await Promise.all([
     getMyHabitsFor(me.user.id, today),
     supabase.rpc("group_habits_today", { p_group: groupId, p_today: today }),
     supabase.rpc("group_leaderboard", { p_group: groupId, p_period: "week", p_today: today }),
@@ -48,6 +49,8 @@ export default async function GroupDashboard({ params }: { params: Promise<{ gro
       .eq("performed_on", today)
       .order("created_at", { ascending: false }),
     group.member_count < MIN_MEMBERS ? getActiveInviteCode(groupId) : Promise.resolve(null),
+    supabase.from("meal_entries").select("calories, source, external_id").eq("user_id", me.user.id).eq("eaten_on", today),
+    supabase.from("private_health_profiles").select("calorie_target").eq("user_id", me.user.id).maybeSingle(),
   ]);
 
   const lb = board.data ?? [];
@@ -103,6 +106,16 @@ export default async function GroupDashboard({ params }: { params: Promise<{ gro
           <Card className="order-2">
             <CardHeader title={myWorkouts.data?.length ? "Today's workouts" : "Nothing logged yet"} />
             <MyTodayWorkouts workouts={myWorkouts.data ?? []} today={today} defaultVisibility={me.settings.default_workout_visibility} />
+          </Card>
+
+          <Card className="order-2">
+            <CardHeader title="Calories today" />
+            <QuickCalories
+              today={today}
+              dayTotal={(myMeals.data ?? []).find((m) => m.source === "manual" && m.external_id === `day:${today}`)?.calories ?? null}
+              otherToday={(myMeals.data ?? []).filter((m) => !(m.source === "manual" && m.external_id === `day:${today}`)).reduce((s, m) => s + m.calories, 0)}
+              target={myHealth.data?.calorie_target ?? null}
+            />
           </Card>
 
           <Card className="order-5">

@@ -23,6 +23,9 @@ export function WorkoutItem({ w, today, defaultVisibility, showDate }: { w: Work
         <div className="flex items-center gap-2 text-sm font-semibold">
           {a.label}
           {w.visibility === "private" ? <Lock className="h-3 w-3 text-faint" aria-label="Private" /> : null}
+          {w.source === "strava" || w.source === "apple_health" ? (
+            <span className="rounded-full border border-line px-1.5 font-mono text-[10px] font-normal text-faint">{w.source === "strava" ? "strava" : "apple health"}</span>
+          ) : null}
         </div>
         <div className="wrap-text text-xs text-muted">
           {showDate ? `${prettyDate(w.performed_on)} · ` : ""}

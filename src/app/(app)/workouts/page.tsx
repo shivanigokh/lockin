@@ -21,7 +21,7 @@ export default async function WorkoutsPage({ searchParams }: { searchParams: Pro
   const supabase = await createClient();
   const { data } = await supabase
     .from("workouts")
-    .select("id, activity_type, performed_on, duration_min, distance_km, note, visibility")
+    .select("id, activity_type, performed_on, duration_min, distance_km, note, visibility, source")
     .eq("user_id", me.user.id)
     .gte("performed_on", from)
     .lte("performed_on", to)

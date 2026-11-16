@@ -16,6 +16,7 @@ export type WorkoutRow = {
   distance_km: number | null;
   note: string | null;
   visibility: "groups" | "private";
+  source?: string;
 };
 
 const QUICK_MINUTES = [15, 30, 45, 60, 90];

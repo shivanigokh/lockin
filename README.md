@@ -26,6 +26,8 @@ Built with Next.js (App Router) · TypeScript · Tailwind CSS v4 · Supabase (Au
 | **Private health** | Height, starting/target weight, weigh-ins with history chart, body measurements (waist, hips, chest, body fat, resting HR, VO₂ max, push-ups, plank), personal notes, health goals text, kg/lb + cm/in. Progress charts: weekly consistency, 30-day habit trend, monthly summary, goal completion. |
 | **Settings** | Profile, habits, privacy (habit sharing, default workout visibility), units, timezone, in-app notification preferences, manage squads, pending invitations, password, delete account |
 | **Usage dashboard** | `/admin`, visible only to the owner email listed in `app_admins` (seeded with the owner's address). Total/new/active users, squads, workouts, habits, goals, challenges and a 30-day chart. Aggregate counts only, enforced in the database. |
+| **Connected apps** | Strava (OAuth, auto-sync on app open, "Sync now", disconnect deletes imported data). Apple Health through an iPhone Shortcut and a personal sync key (daily calories, optional workouts). HealthifyMe can't be synced (no API, and it doesn't write calories to Apple Health), so its daily total is typed into the "Calories today" box. |
+| **Food** | Private calorie log in the vault: meals or whole-day totals, optional macros, daily target, 14-day chart. Never shared, never on leaderboards. |
 | **Notifications** | In-app: reactions, new challenges, username invites, new squad members, each switchable in settings |
 
 ## Privacy model (enforced in Postgres, not the UI)
@@ -97,7 +99,16 @@ BASE_URL=http://localhost:3000 npm run test:e2e   # browser flows (needs `npx pl
 
 4. Deploy. Then put the final domain back into Supabase's Site URL / Redirect URLs if it changed.
 
-### 3. Smoke test production
+### 3. Strava (optional)
+
+1. Create an API app at <https://www.strava.com/settings/api>. Set **Authorization Callback Domain** to your Vercel domain (no `https://`).
+2. Add `STRAVA_CLIENT_ID` and `STRAVA_CLIENT_SECRET` to Vercel (server-only, no `NEXT_PUBLIC_`). Redeploy.
+3. New Strava apps allow a small number of connected athletes until Strava approves more, which is fine for one squad.
+4. Strava's API terms only let an app show a user's Strava data to that same user, so imported workouts are saved as **private**. A user can switch one to shared themselves.
+
+Apple Health: build the "nudge sync" Shortcut once on an iPhone (with an Import Question for the sync key), share it with **Copy iCloud Link**, and set `HEALTH_SHORTCUT_URL` to that link. Everyone then gets a one-tap flow in Settings → Connected apps: get key (auto-copied) → Add to iPhone → run once to allow Health access → add a daily automation. Without the variable, Settings shows build-it-yourself steps. The `/api/ingest` endpoint checks that key inside the `ingest_health_items()` database function.
+
+### 4. Smoke test production
 
 Sign up three accounts (or three friends), create a squad, join with the code, log a workout, tick habits, add a weigh-in and check it doesn't show up for the others, share a goal and watch the percentage appear on the squad's Shared goals page. Or run `BASE_URL=https://<domain> npm run test:e2e` against a project with email confirmation temporarily off.
 
