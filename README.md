@@ -106,7 +106,7 @@ BASE_URL=http://localhost:3000 npm run test:e2e   # browser flows (needs `npx pl
 3. New Strava apps allow a small number of connected athletes until Strava approves more, which is fine for one squad.
 4. Strava's API terms only let an app show a user's Strava data to that same user, so imported workouts are saved as **private**. A user can switch one to shared themselves.
 
-Apple Health needs no setup on your side: each user makes a sync key in Settings → Connected apps and follows the in-app Shortcut steps. The `/api/ingest` endpoint checks that key inside the `ingest_health_items()` database function.
+Apple Health: build the "nudge sync" Shortcut once on an iPhone (with an Import Question for the sync key), share it with **Copy iCloud Link**, and set `HEALTH_SHORTCUT_URL` to that link. Everyone then gets a one-tap flow in Settings → Connected apps: get key (auto-copied) → Add to iPhone → run once to allow Health access → add a daily automation. Without the variable, Settings shows build-it-yourself steps. The `/api/ingest` endpoint checks that key inside the `ingest_health_items()` database function.
 
 ### 4. Smoke test production
 

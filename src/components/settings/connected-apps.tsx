@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { Apple, Copy, KeyRound, Link2, RefreshCw, Unplug } from "lucide-react";
+import { Apple, Check, Copy, KeyRound, Link2, RefreshCw, Smartphone, Unplug } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { useToast } from "@/components/ui/toast";
@@ -19,7 +19,7 @@ const STRAVA_STATUS: Record<string, [string, "error" | undefined]> = {
   error: ["Couldn't connect to Strava. Try again.", "error"],
 };
 
-export function ConnectedApps({ strava, stravaReady, ingestKey, ingestUrl, status }: { strava: Strava; stravaReady: boolean; ingestKey: Key; ingestUrl: string; status?: string }) {
+export function ConnectedApps({ strava, stravaReady, ingestKey, ingestUrl, shortcutUrl, status }: { strava: Strava; stravaReady: boolean; ingestKey: Key; ingestUrl: string; shortcutUrl: string | null; status?: string }) {
   const toast = useToast();
   const shown = useRef(false);
   useEffect(() => {
@@ -33,7 +33,7 @@ export function ConnectedApps({ strava, stravaReady, ingestKey, ingestUrl, statu
     <div className="space-y-6">
       <StravaPanel strava={strava} ready={stravaReady} />
       <div className="border-t border-line/60 pt-5">
-        <AppleHealthPanel ingestKey={ingestKey} ingestUrl={ingestUrl} />
+        <AppleHealthPanel ingestKey={ingestKey} ingestUrl={ingestUrl} shortcutUrl={shortcutUrl} />
       </div>
     </div>
   );
@@ -97,53 +97,98 @@ function StravaPanel({ strava, ready }: { strava: Strava; ready: boolean }) {
   );
 }
 
-function AppleHealthPanel({ ingestKey, ingestUrl }: { ingestKey: Key; ingestUrl: string }) {
+function AppleHealthPanel({ ingestKey, ingestUrl, shortcutUrl }: { ingestKey: Key; ingestUrl: string; shortcutUrl: string | null }) {
   const [token, setToken] = useState<string | null>(null);
-  const [make, making] = useAction(createIngestToken, { onSuccess: (d) => setToken(d?.token ?? null) });
-  const [revoke, revoking] = useAction(revokeIngestToken, { onSuccess: () => setToken(null) });
   const toast = useToast();
-  const copy = (v: string) => navigator.clipboard?.writeText(v).then(() => toast("Copied."));
+  const copy = (v: string, msg = "Copied.") =>
+    navigator.clipboard?.writeText(v).then(
+      () => toast(msg),
+      () => toast("Couldn't copy. Long-press the key to copy it.", "error"),
+    );
+  const [make, making] = useAction(createIngestToken, {
+    onSuccess: (d) => {
+      if (!d?.token) return;
+      setToken(d.token);
+      copy(d.token, "Sync key copied. Paste it when the Shortcut asks.");
+    },
+  });
+  const [revoke, revoking] = useAction(revokeIngestToken, { onSuccess: () => setToken(null) });
+  const hasKey = Boolean(ingestKey || token);
   return (
     <div>
       <div className="mb-2 flex items-center gap-2">
         <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/90 text-[#141218]">
           <Apple className="h-4 w-4" />
         </span>
-        <h3 className="font-semibold">Apple Health (via Shortcuts)</h3>
+        <h3 className="font-semibold">Apple Health</h3>
       </div>
       <p className="text-sm text-muted">
-        Apple Health has no web connection, so an iPhone Shortcut sends your data here. Use it for <b>daily calories</b> (including from food apps like HealthifyMe that write to Apple Health) and, if you don&apos;t use Strava, workouts. Calories land in your private vault only.
+        Sends your <b>daily calories</b> from Apple Health (including food apps like HealthifyMe that write to it) to your private vault. Your iPhone asks before anything is added or shared.
       </p>
 
-      {token ? (
-        <div className="mt-3 rounded-xl border border-line bg-white/[0.04] p-3">
-          <div className="label-mono mb-1 text-[10px]">your sync key (shown once)</div>
-          <div className="flex items-center gap-2">
-            <code className="min-w-0 flex-1 break-all font-mono text-xs">{token}</code>
-            <Button size="icon" variant="ghost" aria-label="Copy key" onClick={() => copy(token)}>
-              <Copy className="h-4 w-4" />
+      {shortcutUrl ? (
+        <ol className="mt-4 space-y-4">
+          <Step n={1} title="Get your sync key" done={hasKey}>
+            {token ? (
+              <KeyBox token={token} onCopy={() => copy(token)} />
+            ) : ingestKey ? (
+              <p className="text-xs text-faint">
+                Key active since {relTime(ingestKey.created_at)}. {ingestKey.last_used_at ? `Last synced ${relTime(ingestKey.last_used_at)}.` : "Not used yet."} Setting up a new phone? Make a new key.
+              </p>
+            ) : (
+              <p className="text-xs text-faint">We copy it for you. It&apos;s only shown once.</p>
+            )}
+            <div className="mt-2 flex flex-wrap gap-2">
+              <Button size="sm" variant={hasKey ? "secondary" : "primary"} loading={making} onClick={() => make()}>
+                <KeyRound className="h-4 w-4" /> {hasKey ? "New key" : "Get & copy key"}
+              </Button>
+              {hasKey ? (
+                <Button size="sm" variant="ghost" loading={revoking} onClick={() => revoke()}>
+                  Revoke
+                </Button>
+              ) : null}
+            </div>
+          </Step>
+          <Step n={2} title="Add the Shortcut to your iPhone">
+            <p className="text-xs text-faint">Opens Shortcuts. Tap <b>Add Shortcut</b> and paste your key when asked.</p>
+            <a href={shortcutUrl} target="_blank" rel="noreferrer" className="mt-2 inline-flex h-9 items-center gap-1.5 rounded-full bg-white px-3.5 text-[13px] font-semibold text-[#141218] transition hover:brightness-95">
+              <Smartphone className="h-4 w-4" /> Add to iPhone
+            </a>
+          </Step>
+          <Step n={3} title="Run it once">
+            <p className="text-xs text-faint">iPhone asks to let it read Dietary Energy and talk to this site. Tap <b>Allow</b> for both.</p>
+            <a href={`shortcuts://run-shortcut?name=${encodeURIComponent(SHORTCUT_NAME)}`} className="mt-2 inline-flex h-9 items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.08] px-3.5 text-[13px] font-semibold text-ink transition hover:bg-white/[0.12]">
+              <RefreshCw className="h-4 w-4" /> Sync now
+            </a>
+          </Step>
+          <Step n={4} title="Make it automatic">
+            <p className="text-xs text-faint">
+              Shortcuts &rarr; <b>Automation</b> &rarr; <b>+</b> &rarr; <b>Time of Day</b>, 10 pm, Daily &rarr; <b>Run Immediately</b> &rarr; pick “{SHORTCUT_NAME}”. Apple only lets you set this up yourself.
+            </p>
+          </Step>
+        </ol>
+      ) : (
+        <>
+          {token ? <KeyBox token={token} onCopy={() => copy(token)} /> : ingestKey ? (
+            <p className="mt-2 text-xs text-faint">Sync key active since {relTime(ingestKey.created_at)}. {ingestKey.last_used_at ? `Last used ${relTime(ingestKey.last_used_at)}.` : "Not used yet."}</p>
+          ) : null}
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button size="sm" variant="secondary" loading={making} onClick={() => make()}>
+              <KeyRound className="h-4 w-4" /> {hasKey ? "Make a new key" : "Make a sync key"}
             </Button>
+            {hasKey ? (
+              <Button size="sm" variant="ghost" loading={revoking} onClick={() => revoke()}>
+                Revoke key
+              </Button>
+            ) : null}
           </div>
-        </div>
-      ) : ingestKey ? (
-        <p className="mt-2 text-xs text-faint">Sync key active since {relTime(ingestKey.created_at)}. {ingestKey.last_used_at ? `Last used ${relTime(ingestKey.last_used_at)}.` : "Not used yet."}</p>
-      ) : null}
-
-      <div className="mt-3 flex flex-wrap gap-2">
-        <Button size="sm" variant="secondary" loading={making} onClick={() => make()}>
-          <KeyRound className="h-4 w-4" /> {ingestKey || token ? "Make a new key" : "Make a sync key"}
-        </Button>
-        {ingestKey || token ? (
-          <Button size="sm" variant="ghost" loading={revoking} onClick={() => revoke()}>
-            Revoke key
-          </Button>
-        ) : null}
-      </div>
+        </>
+      )}
 
       <details className="mt-4 rounded-xl border border-line/70 p-3 text-sm">
-        <summary className="cursor-pointer font-semibold">How to set up the Shortcut</summary>
+        <summary className="cursor-pointer font-semibold">{shortcutUrl ? "Build the Shortcut yourself instead" : "How to set up the Shortcut"}</summary>
         <ol className="mt-3 list-decimal space-y-2 pl-5 text-muted">
-          <li>Open <b>Shortcuts</b> on your iPhone, tap <b>+</b> to make a new shortcut, name it “nudge sync”.</li>
+          <li>Open <b>Shortcuts</b> on your iPhone, tap <b>+</b> to make a new shortcut, name it “{SHORTCUT_NAME}”.</li>
           <li>
             Add <b>Find Health Samples</b>: Type <b>Dietary Energy</b>, Start Date <b>is today</b>. Then <b>Calculate Statistics</b>: <b>Sum</b>.
           </li>
@@ -156,16 +201,44 @@ function AppleHealthPanel({ ingestKey, ingestUrl }: { ingestKey: Key; ingestUrl:
             . Method <b>POST</b>, Headers: <code className="font-mono text-xs">Authorization</code> = <code className="font-mono text-xs">Bearer &lt;your key&gt;</code>. Request Body <b>JSON</b> with <code className="font-mono text-xs">calories</code> (Number) = the Statistics result, and <code className="font-mono text-xs">date</code> (Text) = <b>Current Date</b> formatted as <b>ISO 8601</b>, date only.
           </li>
           <li>
-            In the <b>Automation</b> tab, make a <b>Time of Day</b> automation (say 10 pm, daily, <b>Run Immediately</b>) that runs “nudge sync”. Running it again the same day just updates that day&apos;s total.
+            In the <b>Automation</b> tab, make a <b>Time of Day</b> automation (say 10 pm, daily, <b>Run Immediately</b>) that runs “{SHORTCUT_NAME}”. Running it again the same day just updates that day&apos;s total.
           </li>
           <li>
             Optional workouts: send <code className="font-mono text-xs">type</code> (e.g. “Running”), <code className="font-mono text-xs">duration_min</code>, <code className="font-mono text-xs">distance_km</code> and <code className="font-mono text-xs">start</code> (ISO 8601) in the same way. Skip this if you already use Strava, or workouts will count twice.
           </li>
         </ol>
-        <p className="mt-3 text-xs text-faint">
-          HealthifyMe: in its settings, connect Apple Health and allow it to write nutrition. Then check Health &rarr; Browse &rarr; Nutrition &rarr; Dietary Energy shows HealthifyMe as a source.
-        </p>
       </details>
+      <p className="mt-3 text-xs text-faint">
+        HealthifyMe: in its settings, connect Apple Health and allow it to write nutrition. Then check Health &rarr; Browse &rarr; Nutrition &rarr; Dietary Energy shows HealthifyMe as a source.
+      </p>
     </div>
+  );
+}
+
+const SHORTCUT_NAME = "nudge sync";
+
+function KeyBox({ token, onCopy }: { token: string; onCopy: () => void }) {
+  return (
+    <div className="mt-1 rounded-xl border border-line bg-white/[0.04] p-3">
+      <div className="label-mono mb-1 text-[10px]">your sync key (shown once)</div>
+      <div className="flex items-center gap-2">
+        <code className="min-w-0 flex-1 break-all font-mono text-xs">{token}</code>
+        <Button size="icon" variant="ghost" aria-label="Copy key" onClick={onCopy}>
+          <Copy className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function Step({ n, title, done, children }: { n: number; title: string; done?: boolean; children: React.ReactNode }) {
+  return (
+    <li className="flex gap-3">
+      <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full font-mono text-xs ${done ? "bg-lavender text-[#141218]" : "border border-line text-muted"}`}>{done ? <Check className="h-3.5 w-3.5" /> : n}</span>
+      <div className="min-w-0 flex-1">
+        <div className="text-sm font-semibold">{title}</div>
+        {children}
+      </div>
+    </li>
   );
 }

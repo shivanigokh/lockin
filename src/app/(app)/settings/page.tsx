@@ -10,7 +10,7 @@ import { Field, Input } from "@/components/ui/field";
 import { updatePassword } from "@/app/actions/auth";
 import { ConnectedApps } from "@/components/settings/connected-apps";
 import { stravaConfigured } from "@/lib/strava";
-import { SITE_URL } from "@/lib/env";
+import { HEALTH_SHORTCUT_URL, SITE_URL } from "@/lib/env";
 
 export const metadata: Metadata = { title: "Settings" };
 
@@ -57,7 +57,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         </Card>
         <Card id="connected-apps" className="scroll-mt-28">
           <CardHeader label="connected apps" title="Sync workouts & calories" />
-          <ConnectedApps strava={strava} stravaReady={stravaConfigured()} ingestKey={ingestKey} ingestUrl={`${SITE_URL}/api/ingest`} status={stravaStatus} />
+          <ConnectedApps strava={strava} stravaReady={stravaConfigured()} ingestKey={ingestKey} ingestUrl={`${SITE_URL}/api/ingest`} shortcutUrl={HEALTH_SHORTCUT_URL} status={stravaStatus} />
         </Card>
         <Card id="privacy" className="scroll-mt-28">
           <CardHeader label="privacy & preferences" title="What squads can see" />
