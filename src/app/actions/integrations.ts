@@ -111,3 +111,31 @@ export async function saveCalorieTarget(input: unknown): Promise<ActionResult> {
   revalidatePath("/me");
   return okResult(parsed.data ? "Daily target saved." : "Target cleared.");
 }
+
+const dayTotalSchema = z.object({
+  eaten_on: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Pick a date."),
+  calories: z.coerce.number().int("Whole calories please.").min(0).max(20000, "That's a lot of calories."),
+});
+
+/** Sets (or replaces) the day's total, e.g. copied from HealthifyMe each night. */
+export async function setDayCalories(input: z.input<typeof dayTotalSchema>): Promise<ActionResult> {
+  const user = await requireUser();
+  const parsed = dayTotalSchema.safeParse(input);
+  if (!parsed.success) return errResult(parsed.error.issues[0]!.message);
+  const supabase = await createClient();
+  const { error } = await supabase.from("meal_entries").upsert(
+    {
+      user_id: user.id,
+      eaten_on: parsed.data.eaten_on,
+      meal: "day_total",
+      name: "Daily total",
+      calories: parsed.data.calories,
+      source: "manual",
+      external_id: `day:${parsed.data.eaten_on}`,
+    },
+    { onConflict: "user_id,source,external_id" },
+  );
+  if (error) return errResult(friendlyError(error));
+  revalidatePath("/", "layout");
+  return okResult("Saved. Only you can see this.");
+}

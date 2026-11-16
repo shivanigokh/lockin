@@ -26,7 +26,7 @@ Built with Next.js (App Router) · TypeScript · Tailwind CSS v4 · Supabase (Au
 | **Private health** | Height, starting/target weight, weigh-ins with history chart, body measurements (waist, hips, chest, body fat, resting HR, VO₂ max, push-ups, plank), personal notes, health goals text, kg/lb + cm/in. Progress charts: weekly consistency, 30-day habit trend, monthly summary, goal completion. |
 | **Settings** | Profile, habits, privacy (habit sharing, default workout visibility), units, timezone, in-app notification preferences, manage squads, pending invitations, password, delete account |
 | **Usage dashboard** | `/admin`, visible only to the owner email listed in `app_admins` (seeded with the owner's address). Total/new/active users, squads, workouts, habits, goals, challenges and a 30-day chart. Aggregate counts only, enforced in the database. |
-| **Connected apps** | Strava (OAuth, auto-sync on app open, "Sync now", disconnect deletes imported data). Apple Health through an iPhone Shortcut and a personal sync key (daily calories, optional workouts). HealthifyMe via Apple Health. |
+| **Connected apps** | Strava (OAuth, auto-sync on app open, "Sync now", disconnect deletes imported data). Apple Health through an iPhone Shortcut and a personal sync key (daily calories, optional workouts). HealthifyMe can't be synced (no API, and it doesn't write calories to Apple Health), so its daily total is typed into the "Calories today" box. |
 | **Food** | Private calorie log in the vault: meals or whole-day totals, optional macros, daily target, 14-day chart. Never shared, never on leaderboards. |
 | **Notifications** | In-app: reactions, new challenges, username invites, new squad members, each switchable in settings |
 

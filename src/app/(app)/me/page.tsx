@@ -165,7 +165,7 @@ export default async function MyHealthPage() {
           <div className="mt-4 border-t border-line/60 pt-4">
             <CalorieTargetForm target={kcalTarget} />
             <p className="mt-2 text-xs text-faint">
-              Synced from HealthifyMe or another food app? Set up the Apple Health Shortcut in <a href="/settings#connected-apps" className="underline">Settings</a>.
+              Food app writes to Apple Health? Sync it automatically from <a href="/settings#connected-apps" className="underline">Settings</a>. HealthifyMe doesn&apos;t, so log its daily total here or on your squad page.
             </p>
           </div>
         </Card>

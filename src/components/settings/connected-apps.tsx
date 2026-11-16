@@ -123,7 +123,7 @@ function AppleHealthPanel({ ingestKey, ingestUrl, shortcutUrl }: { ingestKey: Ke
         <h3 className="font-semibold">Apple Health</h3>
       </div>
       <p className="text-sm text-muted">
-        Sends your <b>daily calories</b> from Apple Health (including food apps like HealthifyMe that write to it) to your private vault. Your iPhone asks before anything is added or shared.
+        Sends your <b>daily calories</b> from Apple Health to your private vault. Works with food apps that write to Apple Health (MyFitnessPal, Cronometer, Lose It!, Yazio). Your iPhone asks before anything is added or shared.
       </p>
 
       {shortcutUrl ? (
@@ -209,7 +209,7 @@ function AppleHealthPanel({ ingestKey, ingestUrl, shortcutUrl }: { ingestKey: Ke
         </ol>
       </details>
       <p className="mt-3 text-xs text-faint">
-        HealthifyMe: in its settings, connect Apple Health and allow it to write nutrition. Then check Health &rarr; Browse &rarr; Nutrition &rarr; Dietary Energy shows HealthifyMe as a source.
+        Using HealthifyMe? It doesn&apos;t share calories with Apple Health, so type the day&apos;s total into the &ldquo;Calories today&rdquo; box on your squad page instead.
       </p>
     </div>
   );
