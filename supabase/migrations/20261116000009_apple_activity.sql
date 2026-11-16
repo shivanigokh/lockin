@@ -5,9 +5,11 @@
 -- source 'apple_health' and external_id 'exercise:<date>'. Re-sending the day
 -- updates its minutes instead of adding a second session.
 --
--- Active Energy (calories burned) is stored per day in activity_days. The
--- table is owner-only; squads only see totals through group_burn_board(),
--- which checks membership first (the "most calories burned" leaderboard).
+-- Active Energy (calories burned) is stored per day in activity_days. By the
+-- owner's choice it is social, like shared workouts: the owner, squad-mates and
+-- friends can read each day's value (can_follow), and squads get a "most
+-- calories burned" leaderboard through group_burn_board(). Calories EATEN stay
+-- in owner-only meal_entries.
 
 create table public.activity_days (
   user_id      uuid not null references public.profiles (id) on delete cascade,
@@ -21,6 +23,9 @@ revoke all on public.activity_days from anon;
 create policy "activity_days: owner" on public.activity_days
   for all to authenticated
   using (user_id = auth.uid()) with check (user_id = auth.uid());
+create policy "activity_days: squad-mates and friends read" on public.activity_days
+  for select to authenticated
+  using (public.can_follow(user_id));
 
 create or replace function public.group_burn_board(p_group uuid, p_period text, p_today date)
 returns table (user_id uuid, active_kcal int)

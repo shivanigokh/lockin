@@ -25,7 +25,7 @@ export default async function FriendPage({ params }: { params: Promise<{ userId:
   const since = new Date(new Date(me.today).getTime() - 29 * 864e5).toISOString().slice(0, 10);
   const weekStart = new Date(new Date(me.today).getTime() - 6 * 864e5).toISOString().slice(0, 10);
   // Every query below is filtered again by RLS: only shared workouts and visible habits come back.
-  const [{ data: profile }, { data: workouts }, { data: habits }, { data: done }] = await Promise.all([
+  const [{ data: profile }, { data: workouts }, { data: habits }, { data: done }, { data: burn }] = await Promise.all([
     supabase.from("profiles").select("id, username, display_name, avatar_url, bio").eq("id", userId).single(),
     supabase
       .from("workouts")
@@ -36,6 +36,7 @@ export default async function FriendPage({ params }: { params: Promise<{ userId:
       .limit(30),
     supabase.from("daily_habits").select("id, name, icon").eq("user_id", userId).eq("archived", false).order("sort_order"),
     supabase.from("habit_completions").select("habit_id").eq("user_id", userId).eq("completed_on", me.today),
+    supabase.from("activity_days").select("day, active_kcal").eq("user_id", userId).gte("day", weekStart),
   ]);
   if (!profile) notFound();
 
@@ -44,6 +45,8 @@ export default async function FriendPage({ params }: { params: Promise<{ userId:
   const week = ws.filter((w) => w.performed_on >= weekStart);
   const doneSet = new Set((done ?? []).map((d) => d.habit_id));
   const hs = habits ?? [];
+  const burnToday = (burn ?? []).find((b) => b.day === me.today)?.active_kcal ?? null;
+  const burnWeek = (burn ?? []).reduce((s, b) => s + b.active_kcal, 0);
 
   return (
     <Page className="max-w-2xl">
@@ -68,6 +71,18 @@ export default async function FriendPage({ params }: { params: Promise<{ userId:
           <div className="font-display text-3xl font-bold tabular-nums text-pink">{week.reduce((s, w) => s + w.duration_min, 0)}</div>
           <div className="text-xs text-muted">active minutes this week</div>
         </div>
+        {burn?.length ? (
+          <>
+            <div className="card px-4 py-3">
+              <div className="font-display text-3xl font-bold tabular-nums text-orange">{burnToday ?? "–"}</div>
+              <div className="text-xs text-muted">kcal burned today</div>
+            </div>
+            <div className="card px-4 py-3">
+              <div className="font-display text-3xl font-bold tabular-nums text-cyan">{burnWeek}</div>
+              <div className="text-xs text-muted">kcal burned this week</div>
+            </div>
+          </>
+        ) : null}
       </div>
 
       <div className="space-y-4">

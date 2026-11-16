@@ -556,7 +556,7 @@ describe("Apple Watch exercise minutes and calories burned", () => {
       .join("");
   const anon = () => createClient(URL, ANON, { auth: { persistSession: false, autoRefreshToken: false } });
 
-  it("one Active day per date that updates, burned calories private except the squad total", async () => {
+  it("one Active day per date that updates; burned calories visible to squad-mates, not outsiders", async () => {
     const [G, H, I, O] = await Promise.all(["burn_g", "burn_h", "burn_i", "burn_o"].map(makeUser));
     const g = ok(await G.c.rpc("create_group", { p_name: `Burners ${run}` })) as string;
     const c = (ok(await G.c.from("group_invites").select("code").eq("group_id", g)) as { code: string }[])[0].code;
@@ -570,10 +570,12 @@ describe("Apple Watch exercise minutes and calories burned", () => {
 
     const ws = ok(await G.c.from("workouts").select("duration_min, source").eq("user_id", G.id)) as unknown[];
     expect(ws).toEqual([{ duration_min: 45, source: "apple_health" }]);
-    // squad-mates see the total on the burn board, not the raw rows
+    // squad-mates (and friends) see the board and each day's burn; outsiders see nothing
     const board = ok(await H.c.rpc("group_burn_board", { p_group: g, p_period: "week", p_today: today })) as { user_id: string; active_kcal: number }[];
     expect(board.find((r) => r.user_id === G.id)?.active_kcal).toBe(610);
-    expect(ok(await H.c.from("activity_days").select("user_id").eq("user_id", G.id))).toEqual([]);
+    expect(ok(await H.c.from("activity_days").select("active_kcal").eq("user_id", G.id))).toEqual([{ active_kcal: 610 }]);
+    expect(ok(await O.c.from("activity_days").select("active_kcal").eq("user_id", G.id))).toEqual([]);
+    expect((await H.c.from("activity_days").insert({ user_id: G.id, day: today, active_kcal: 1 })).error).toBeTruthy();
     // outsiders can't read the board
     expect((await O.c.rpc("group_burn_board", { p_group: g, p_period: "week", p_today: today })).error).toBeTruthy();
   });
