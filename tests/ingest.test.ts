@@ -48,6 +48,15 @@ describe("ingest normalisation", () => {
     expect(normaliseIngest({ calories: 0, date: today }, today)).toEqual({ items: [], errors: [] });
   });
 
+  it("splits the Shortcut's daily post into exercise minutes and calories burned", () => {
+    const today = "2026-11-16";
+    expect(normaliseIngest({ key: "nk_x", date: today, exercise_minutes: 42.6, active_kcal: "512.3" }, today).items).toEqual([
+      { kind: "exercise", date: today, minutes: 43 },
+      { kind: "active_energy", date: today, kcal: 512 },
+    ]);
+    expect(normaliseIngest({ date: today, exercise_minutes: 0, active_kcal: 0 }, today)).toEqual({ items: [], errors: [] });
+  });
+
   it("turns a Strava activity into a workout row", () => {
     expect(
       stravaToWorkout({ id: 123, name: "Morning Run", sport_type: "Run", start_date_local: "2026-11-16T06:10:00Z", moving_time: 1800, distance: 5012.3 }),

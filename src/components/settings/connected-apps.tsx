@@ -126,7 +126,7 @@ function AppleHealthPanel({ ingestKey, ingestUrl, shortcutUrl }: { ingestKey: Ke
         <h3 className="font-semibold">Apple Health</h3>
       </div>
       <p className="text-sm text-muted">
-        Brings your <b>iPhone and Apple Watch workouts</b> in automatically, including ones other apps (Strava, Nike Run Club, gym apps) save to Apple Health. Your iPhone asks before anything is read or sent.
+        Sends your daily <b>exercise minutes</b> (logged as one &ldquo;Active day&rdquo; session) and <b>calories burned</b> from Apple Health. Calories burned show on the squad &ldquo;Burned&rdquo; leaderboard. Your iPhone asks before anything is read or sent.
       </p>
 
       {shortcutUrl ? (
@@ -159,7 +159,7 @@ function AppleHealthPanel({ ingestKey, ingestUrl, shortcutUrl }: { ingestKey: Ke
             </a>
           </Step>
           <Step n={3} title="Run it once">
-            <p className="text-xs text-faint">iPhone asks to let it read your workouts and talk to this site. Tap <b>Allow</b> for both.</p>
+            <p className="text-xs text-faint">iPhone asks to let it read Exercise Minutes and Active Energy and talk to this site. Tap <b>Allow</b> for both.</p>
             <a href={`shortcuts://run-shortcut?name=${encodeURIComponent(SHORTCUT_NAME)}`} className="mt-2 inline-flex h-9 items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.08] px-3.5 text-[13px] font-semibold text-ink transition hover:bg-white/[0.12]">
               <RefreshCw className="h-4 w-4" /> Sync now
             </a>
@@ -193,21 +193,24 @@ function AppleHealthPanel({ ingestKey, ingestUrl, shortcutUrl }: { ingestKey: Ke
         <ol className="mt-3 list-decimal space-y-2 pl-5 text-muted">
           <li>Open <b>Shortcuts</b>, tap <b>+</b>, name it “{SHORTCUT_NAME}”.</li>
           <li>
-            <b>Find Health Samples</b>: Type <b>Workouts</b>, Start Date <b>is in the last 2 days</b>.
+            <b>Find Health Samples</b>: Type <b>Exercise Minutes</b>, Start Date <b>is today</b>. Then <b>Calculate Statistics</b>: <b>Sum</b>.
           </li>
           <li>
-            <b>Repeat with Each</b> item in Health Samples. Inside the repeat: <b>Get Time Between Dates</b> (Repeat Item&apos;s Start Date &rarr; End Date, in <b>Minutes</b>), and <b>Format Date</b> (Repeat Item&apos;s Start Date, <b>ISO 8601</b>, with time).
+            Another <b>Find Health Samples</b>: Type <b>Active Energy</b>, Start Date <b>is today</b>. Then <b>Calculate Statistics</b>: <b>Sum</b>.
           </li>
           <li>
-            Still inside: <b>Get Contents of URL</b>{" "}
+            <b>Format Date</b>: Current Date, <b>ISO 8601</b>, time off.
+          </li>
+          <li>
+            <b>Get Contents of URL</b>{" "}
             <code className="break-all rounded bg-white/10 px-1 font-mono text-xs">{ingestUrl}</code>
             <button type="button" className="ml-1 text-lavender underline" onClick={() => copy(ingestUrl)}>
               copy
             </button>
-            , Method <b>POST</b>, Request Body <b>JSON</b>: <code className="font-mono text-xs">key</code> = your sync key, <code className="font-mono text-xs">type</code> = Repeat Item&apos;s type, <code className="font-mono text-xs">duration_min</code> = Time Between Dates, <code className="font-mono text-xs">start</code> = Formatted Date, and optionally <code className="font-mono text-xs">distance_km</code>.
+            , Method <b>POST</b>, Request Body <b>JSON</b>: <code className="font-mono text-xs">key</code> (Text) = your sync key, <code className="font-mono text-xs">date</code> (Text) = Formatted Date, <code className="font-mono text-xs">exercise_minutes</code> (Number) = first Statistics, <code className="font-mono text-xs">active_kcal</code> (Number) = second Statistics.
           </li>
           <li>
-            <b>Automation</b> tab &rarr; <b>Time of Day</b>, 10 pm, Daily, <b>Run Immediately</b> &rarr; “{SHORTCUT_NAME}”. Workouts never import twice, so running it often is fine.
+            <b>Automation</b> tab &rarr; <b>Time of Day</b>, 10 pm, Daily, <b>Run Immediately</b> &rarr; “{SHORTCUT_NAME}”. Running it again the same day just updates that day.
           </li>
         </ol>
       </details>

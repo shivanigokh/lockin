@@ -548,3 +548,33 @@ describe("integrations: Strava, Apple Health sync key, food log", () => {
     expect((await anon().from("workouts").insert({ user_id: P.id, activity_type: "running", performed_on: today, duration_min: 5 })).error).toBeTruthy();
   });
 });
+
+describe("Apple Watch exercise minutes and calories burned", () => {
+  const sha256 = async (s: string) =>
+    Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s))))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+  const anon = () => createClient(URL, ANON, { auth: { persistSession: false, autoRefreshToken: false } });
+
+  it("one Active day per date that updates, burned calories private except the squad total", async () => {
+    const [G, H, I, O] = await Promise.all(["burn_g", "burn_h", "burn_i", "burn_o"].map(makeUser));
+    const g = ok(await G.c.rpc("create_group", { p_name: `Burners ${run}` })) as string;
+    const c = (ok(await G.c.from("group_invites").select("code").eq("group_id", g)) as { code: string }[])[0].code;
+    ok(await H.c.rpc("join_group_with_code", { p_code: c }));
+    ok(await I.c.rpc("join_group_with_code", { p_code: c }));
+    const key = `nk_${run}_${"b".repeat(40)}`;
+    ok(await G.c.from("ingest_tokens").insert({ user_id: G.id, token_hash: await sha256(key) }));
+
+    ok(await anon().rpc("ingest_health_items", { p_token: key, p_items: [{ kind: "exercise", date: today, minutes: 20 }, { kind: "active_energy", date: today, kcal: 300 }] }));
+    ok(await anon().rpc("ingest_health_items", { p_token: key, p_items: [{ kind: "exercise", date: today, minutes: 45 }, { kind: "active_energy", date: today, kcal: 610 }] }));
+
+    const ws = ok(await G.c.from("workouts").select("duration_min, source").eq("user_id", G.id)) as unknown[];
+    expect(ws).toEqual([{ duration_min: 45, source: "apple_health" }]);
+    // squad-mates see the total on the burn board, not the raw rows
+    const board = ok(await H.c.rpc("group_burn_board", { p_group: g, p_period: "week", p_today: today })) as { user_id: string; active_kcal: number }[];
+    expect(board.find((r) => r.user_id === G.id)?.active_kcal).toBe(610);
+    expect(ok(await H.c.from("activity_days").select("user_id").eq("user_id", G.id))).toEqual([]);
+    // outsiders can't read the board
+    expect((await O.c.rpc("group_burn_board", { p_group: g, p_period: "week", p_today: today })).error).toBeTruthy();
+  });
+});

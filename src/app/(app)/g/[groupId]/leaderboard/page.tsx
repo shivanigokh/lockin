@@ -31,7 +31,7 @@ export default async function LeaderboardPage({
   const { groupId } = await params;
   const sp = await searchParams;
   const period = PERIODS.some((p) => p.value === sp.period) ? sp.period! : "week";
-  const by = sp.by === "minutes" ? "minutes" : "workouts";
+  const by = sp.by === "minutes" ? "minutes" : sp.by === "burned" ? "burned" : "workouts";
   const { group, me } = await getGroup(groupId);
   const supabase = await createClient();
 
@@ -44,18 +44,22 @@ export default async function LeaderboardPage({
     );
   }
 
-  const [{ data: rows }, { data: awards }] = await Promise.all([
+  const [{ data: rows }, { data: awards }, { data: burn }] = await Promise.all([
     supabase.rpc("group_leaderboard", { p_group: groupId, p_period: period, p_today: me.today }),
     supabase.rpc("group_awards", { p_group: groupId, p_today: me.today }),
+    supabase.rpc("group_burn_board", { p_group: groupId, p_period: period, p_today: me.today }),
   ]);
+  const kcal = new Map((burn ?? []).map((b) => [b.user_id, b.active_kcal]));
+  const metric = (r: { user_id: string; workouts: number; active_minutes: number }) =>
+    by === "minutes" ? r.active_minutes : by === "burned" ? (kcal.get(r.user_id) ?? 0) : r.workouts;
   const list = [...(rows ?? [])].sort((a, b) =>
-    by === "minutes" ? b.active_minutes - a.active_minutes || b.workouts - a.workouts : a.rank - b.rank,
+    by === "workouts" ? a.rank - b.rank : metric(b) - metric(a) || b.workouts - a.workouts,
   );
-  const top = by === "minutes" ? Math.max(1, ...list.map((r) => r.active_minutes)) : Math.max(1, ...list.map((r) => r.workouts));
+  const top = Math.max(1, ...list.map(metric));
   let rank = 0;
   let prev: number | null = null;
   const ranked = list.map((r, i) => {
-    const v = by === "minutes" ? r.active_minutes : r.workouts;
+    const v = metric(r);
     if (v !== prev) rank = i + 1;
     prev = v;
     return { ...r, value: v, place: rank };
@@ -64,17 +68,17 @@ export default async function LeaderboardPage({
 
   return (
     <Page>
-      <PageHeader label={`${group.name}`} title="Leaderboard" sub={`${COPY.leaderboard} But your workout count is. One session = one workout. Never weight, calories or looks.`} />
+      <PageHeader label={`${group.name}`} title="Leaderboard" sub={`${COPY.leaderboard} But your workout count is. One session = one workout. Never weight or looks. Calories burned come from Apple Health, for people who sync it.`} />
 
       <div className="mb-4 flex flex-wrap gap-2 sm:mb-5">
         <SegmentLinks param="period" options={PERIODS} defaultValue="week" />
-        <SegmentLinks param="by" options={[{ value: "workouts", label: "Sessions" }, { value: "minutes", label: "Minutes" }]} defaultValue="workouts" />
+        <SegmentLinks param="by" options={[{ value: "workouts", label: "Sessions" }, { value: "minutes", label: "Minutes" }, { value: "burned", label: "Burned" }]} defaultValue="workouts" />
       </div>
 
       <div className="grid gap-4 sm:gap-5 lg:grid-cols-[1.4fr_1fr]">
         <Card>
           <CardHeader
-            label={by === "minutes" ? "ranked by active minutes" : "ranked by workout sessions"}
+            label={by === "minutes" ? "ranked by active minutes" : by === "burned" ? "ranked by calories burned" : "ranked by workout sessions"}
             title={mine ? `You're #${mine.place} of ${ranked.length}` : "Rankings"}
           />
           <ol className="space-y-2">
@@ -100,8 +104,17 @@ export default async function LeaderboardPage({
                     <ProgressBar value={(r.value / top) * 100} size="sm" color={isMe ? "var(--color-lime)" : "var(--color-lavender)"} className="mt-1.5" />
                   </div>
                   <div className="shrink-0 text-right">
-                    <div className="font-mono text-lg font-bold tabular-nums">{r.workouts}</div>
-                    <div className="text-[11px] text-muted">{r.active_minutes} min</div>
+                    {by === "burned" ? (
+                      <>
+                        <div className="font-mono text-lg font-bold tabular-nums">{r.value}</div>
+                        <div className="text-[11px] text-muted">kcal burned</div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="font-mono text-lg font-bold tabular-nums">{r.workouts}</div>
+                        <div className="text-[11px] text-muted">{r.active_minutes} min</div>
+                      </>
+                    )}
                   </div>
                 </li>
               );
@@ -149,7 +162,7 @@ export default async function LeaderboardPage({
             <CardHeader label="visualised" title="Who's carrying" />
             <LeaderboardChart
               data={ranked.map((r) => ({ name: r.user_id === me.user.id ? "You" : displayName(r), value: r.value, me: r.user_id === me.user.id }))}
-              unit={by === "minutes" ? "min" : "workouts"}
+              unit={by === "minutes" ? "min" : by === "burned" ? "kcal" : "workouts"}
             />
           </Card>
         </div>

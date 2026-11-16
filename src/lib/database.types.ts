@@ -23,7 +23,27 @@ export type Database = {
           }
         },"public": {
           Tables: {
-            "activity_reactions": {
+            "activity_days": {
+                  Row: {
+                    "active_kcal": number,"day": string,"updated_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "active_kcal": number,"day": string,"updated_at"?: string,"user_id": string
+                  }
+                  Update: {
+                    "active_kcal"?: number,"day"?: string,"updated_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "activity_days_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"activity_reactions": {
                   Row: {
                     "activity_id": string,"created_at": string,"emoji": string,"user_id": string
                   }
@@ -635,6 +655,11 @@ isOneToOne: false
 "group_awards":
 { Args: { "p_group": string,"p_today": string }; Returns: {
               "avatar_url": string,"award": string,"detail": string,"display_name": string,"user_id": string,"username": string
+            }[]
+                           },
+"group_burn_board":
+{ Args: { "p_group": string,"p_period": string,"p_today": string }; Returns: {
+              "active_kcal": number,"user_id": string
             }[]
                            },
 "group_calendar":
