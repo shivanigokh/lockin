@@ -9,7 +9,6 @@ import { Modal } from "@/components/ui/modal";
 import { SquadBadge } from "@/components/shell/squad-switcher";
 import { useToast } from "@/components/ui/toast";
 import { useAction } from "@/lib/use-action";
-import { createClient } from "@/lib/supabase/client";
 import { deleteAccount, setAvatar, updateProfile, updateSettings } from "@/app/actions/profile";
 import { archiveHabit, moveHabit, saveHabit } from "@/app/actions/tracking";
 import { leaveSquad } from "@/app/actions/squads";
@@ -30,6 +29,8 @@ export function ProfileForm({ profile }: { profile: Profile }) {
     if (file.size > 2 * 1024 * 1024) return toast("Max 2 MB. It's an avatar, not a billboard.", "error");
     if (!/^image\/(png|jpe?g|webp|gif)$/.test(file.type)) return toast("PNG, JPG, WebP or GIF only.", "error");
     setUploading(true);
+    // the browser Supabase client is ~80 kB; only load it when someone actually uploads
+    const { createClient } = await import("@/lib/supabase/client");
     const supabase = createClient();
     const ext = file.type.split("/")[1]!.replace("jpeg", "jpg");
     const path = `${profile.id}/${Date.now()}.${ext}`;

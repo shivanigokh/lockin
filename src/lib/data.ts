@@ -7,12 +7,18 @@ import { todayIn } from "@/lib/dates";
 
 export const ACTIVE_GROUP_COOKIE = "lockin_squad";
 
+/**
+ * The signed-in user, from the verified session JWT. getClaims() checks the
+ * token's signature locally when the project uses asymmetric signing keys
+ * (no network round trip to Supabase Auth); with legacy shared-secret keys it
+ * falls back to getUser(), so it is never less safe than before.
+ */
 export const getUser = cache(async () => {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  return user;
+  const { data, error } = await supabase.auth.getClaims();
+  const claims = data?.claims;
+  if (error || !claims?.sub) return null;
+  return { id: claims.sub, email: typeof claims.email === "string" ? claims.email : undefined };
 });
 
 export const requireUser = cache(async () => {
@@ -53,18 +59,16 @@ export const getMyGroups = cache(async (): Promise<MyGroup[]> => {
 });
 
 export const getGroup = cache(async (groupId: string) => {
-  const me = await getMe();
-  const supabase = await createClient();
   if (!/^[0-9a-f-]{36}$/i.test(groupId)) notFound();
-  const { data: group } = await supabase.from("groups").select("*").eq("id", groupId).maybeSingle();
-  if (!group) notFound();
-  const { data: membership } = await supabase
-    .from("group_members")
-    .select("role")
-    .eq("group_id", groupId)
-    .eq("user_id", me.user.id)
-    .maybeSingle();
-  if (!membership) notFound();
+  const user = await requireUser();
+  const supabase = await createClient();
+  // one round trip instead of three: profile, group and membership load together
+  const [me, { data: group }, { data: membership }] = await Promise.all([
+    getMe(),
+    supabase.from("groups").select("*").eq("id", groupId).maybeSingle(),
+    supabase.from("group_members").select("role").eq("group_id", groupId).eq("user_id", user.id).maybeSingle(),
+  ]);
+  if (!group || !membership) notFound();
   return { group, isAdmin: membership.role === "admin", me };
 });
 

@@ -10,7 +10,7 @@ import { SegmentLinks } from "@/components/ui/tabs";
 import { Empty } from "@/components/ui/empty";
 import { AWARDS, COPY, MIN_MEMBERS } from "@/lib/constants";
 import { cn, displayName } from "@/lib/utils";
-import { LeaderboardChart } from "@/components/charts/leaderboard-chart";
+import { LeaderboardChart } from "@/components/charts/lazy";
 
 export const metadata: Metadata = { title: "Leaderboard" };
 

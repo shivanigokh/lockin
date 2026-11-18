@@ -162,9 +162,184 @@ input[type="date"]::-webkit-date-and-time-value {
   }
 }
 
+/* ---------- loading & motion ---------- */
+
+/* screen transitions: new screens float up out of a soft blur. "backwards" fill
+   so no transform/filter lingers afterwards (they would trap position:fixed
+   children like sheets and toasts). */
+.screen-in {
+  animation: screen-in 0.38s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+@keyframes screen-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.99);
+    filter: blur(6px);
+  }
+}
+
+/* stagger direct children of a page so cards cascade in */
+.stagger > * {
+  animation: screen-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+.stagger > *:nth-child(2) { animation-delay: 40ms; }
+.stagger > *:nth-child(3) { animation-delay: 80ms; }
+.stagger > *:nth-child(4) { animation-delay: 120ms; }
+.stagger > *:nth-child(5) { animation-delay: 160ms; }
+.stagger > *:nth-child(n + 6) { animation-delay: 200ms; }
+
+/* skeleton shimmer */
+.shimmer {
+  position: relative;
+  overflow: hidden;
+  background: rgb(255 255 255 / 0.055);
+  border: 1px solid rgb(255 255 255 / 0.06);
+  border-radius: 1.5rem;
+}
+.shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(100deg, transparent 20%, rgb(198 199 255 / 0.09) 45%, rgb(255 107 87 / 0.06) 55%, transparent 80%);
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+@keyframes shimmer {
+  to { transform: translateX(100%); }
+}
+
+/* bottom sheet / dialog: slides up on phones, pops on desktop */
+dialog.sheet[open] {
+  animation: sheet-up 0.42s cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+dialog.sheet[open]::backdrop {
+  animation: loader-in 0.3s ease;
+}
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+}
+@media (min-width: 640px) {
+  dialog.sheet[open] {
+    animation: sheet-pop 0.3s cubic-bezier(0.2, 1.2, 0.4, 1);
+  }
+}
+@keyframes sheet-pop {
+  from { opacity: 0; transform: translateY(8px) scale(0.96); }
+}
+
+/* top-of-screen route progress */
+.nav-progress {
+  height: 100%;
+  width: 0;
+  opacity: 0;
+  border-radius: 0 9999px 9999px 0;
+  background: linear-gradient(90deg, #7579e0, #c6c7ff 60%, #ff6b57);
+  box-shadow: 0 0 12px rgb(151 154 255 / 0.8), 0 0 4px rgb(255 107 87 / 0.6);
+}
+.nav-progress[data-phase="loading"] {
+  opacity: 1;
+  animation: nav-trickle 8s cubic-bezier(0.1, 0.7, 0.2, 1) forwards;
+}
+.nav-progress[data-phase="done"] {
+  width: 100%;
+  opacity: 0;
+  transition: width 0.2s ease-out, opacity 0.3s ease 0.15s;
+}
+@keyframes nav-trickle {
+  0% { width: 0; }
+  10% { width: 35%; }
+  40% { width: 70%; }
+  100% { width: 92%; }
+}
+
+/* branded loader */
+.nudge-loader-tile {
+  animation: nudge-push 1.6s cubic-bezier(0.3, 0.7, 0.3, 1) infinite;
+  transform-origin: 30% 100%;
+}
+.nudge-loader-arch {
+  stroke-dasharray: 100;
+  animation: nudge-draw 1.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+.nudge-loader-dot {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: nudge-dot 1.6s cubic-bezier(0.3, 0, 0.3, 1) infinite;
+}
+.nudge-loader-glow {
+  position: absolute;
+  inset: -30%;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgb(117 121 224 / 0.55), rgb(233 75 60 / 0.15) 50%, transparent 70%);
+  filter: blur(12px);
+  animation: nudge-glow 1.6s ease-in-out infinite;
+}
+@keyframes nudge-draw {
+  0% { stroke-dashoffset: 100; }
+  45%, 70% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -100; }
+}
+@keyframes nudge-dot {
+  0% { transform: translate(0, -14px) scale(0.6); opacity: 0; }
+  20% { opacity: 1; }
+  38% { transform: translate(0, 0) scale(1.15, 0.8); }
+  48% { transform: translate(0, -6px) scale(0.95, 1.05); }
+  58%, 80% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(0, 0) scale(0.6); opacity: 0; }
+}
+@keyframes nudge-push {
+  0%, 36% { transform: rotate(0) translateX(0); }
+  42% { transform: rotate(-5deg) translateX(-2px); }
+  54% { transform: rotate(1.5deg) translateX(0.5px); }
+  64%, 100% { transform: rotate(0) translateX(0); }
+}
+@keyframes nudge-glow {
+  0%, 100% { opacity: 0.55; transform: scale(0.92); }
+  45% { opacity: 1; transform: scale(1.05); }
+}
+
+/* full-screen loader fades in after a beat so fast loads never flash it */
+.loader-screen {
+  background: radial-gradient(120% 80% at 50% 40%, rgb(29 26 34 / 0.6), var(--color-bg));
+  animation: loader-in 0.3s ease 0.12s backwards;
+}
+@keyframes loader-in {
+  from { opacity: 0; }
+}
+.loader-line {
+  opacity: 0;
+  animation: loader-line 6.4s ease-in-out infinite both;
+}
+@keyframes loader-line {
+  0% { opacity: 0; transform: translateY(100%); }
+  3%, 23% { opacity: 1; transform: translateY(0); }
+  25.5%, 100% { opacity: 0; transform: translateY(-100%); }
+}
+
+/* a small inline loader that fades in (used above skeletons) */
+.fade-in-late {
+  animation: loader-in 0.3s ease 0.2s backwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* with reduced motion, loaders sit still instead of strobing */
+@media (prefers-reduced-motion: reduce) {
+  .nudge-loader-tile,
+  .nudge-loader-arch,
+  .nudge-loader-dot,
+  .nudge-loader-glow,
+  .shimmer::after,
+  .loader-line,
+  .nav-progress[data-phase="loading"] {
+    animation: none !important;
+  }
+  .nudge-loader-arch { stroke-dashoffset: 0; }
+  .loader-line:first-child { opacity: 1; }
+  .nav-progress[data-phase="loading"] { width: 70%; }
 }
