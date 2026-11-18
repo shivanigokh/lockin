@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Page, PageHeader } from "@/components/page-header";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TypeChart, UsageChart } from "@/components/charts/usage-chart";
+import { TypeChart, UsageChart } from "@/components/charts/lazy";
 import { activity, MIN_MEMBERS } from "@/lib/constants";
 import { SquadBadge } from "@/components/shell/squad-switcher";
 import { Avatar } from "@/components/ui/avatar";

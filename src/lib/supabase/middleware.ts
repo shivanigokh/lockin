@@ -24,9 +24,11 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // getClaims() refreshes an expiring session like getUser() did, but verifies
+  // the JWT locally when the project has asymmetric signing keys, which skips a
+  // network round trip to Supabase Auth on every single request.
+  const { data } = await supabase.auth.getClaims();
+  const user = data?.claims?.sub ? data.claims : null;
 
   const { pathname, search } = request.nextUrl;
 

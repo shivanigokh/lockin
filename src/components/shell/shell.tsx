@@ -12,6 +12,8 @@ import { personalNav, squadNav, isActive, type NavItem } from "./nav-config";
 import type { MyGroup } from "@/lib/data";
 import { cn, displayName } from "@/lib/utils";
 import { COPY } from "@/lib/constants";
+import { useNavPathname } from "@/lib/nav-pending";
+import { haptic } from "@/lib/haptics";
 
 type Me = { id: string; username: string; display_name: string | null; avatar_url: string | null };
 
@@ -51,9 +53,11 @@ export function Shell({
   defaultVisibility: "groups" | "private";
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
+  const realPathname = usePathname();
+  // highlights follow the tap immediately, before the next screen has loaded
+  const pathname = useNavPathname();
   const [logOpen, setLogOpen] = useState(false);
-  const urlGroup = pathname.match(/^\/g\/([0-9a-f-]{36})/i)?.[1] ?? null;
+  const urlGroup = realPathname.match(/^\/g\/([0-9a-f-]{36})/i)?.[1] ?? null;
   const activeId =
     (urlGroup && groups.some((g) => g.id === urlGroup) ? urlGroup : null) ??
     (cookieGroupId && groups.some((g) => g.id === cookieGroupId) ? cookieGroupId : null) ??
@@ -158,7 +162,10 @@ export function Shell({
           <div className="flex justify-center">
             <button
               type="button"
-              onClick={() => setLogOpen(true)}
+              onClick={() => {
+                haptic("tap");
+                setLogOpen(true);
+              }}
               aria-label="Log workout"
               className="relative flex h-14 w-14 items-center justify-center rounded-full text-[#141218] transition active:scale-95 cursor-pointer"
             >
@@ -185,11 +192,11 @@ function BottomLink({ item, pathname }: { item: NavItem; pathname: string }) {
     <Link
       href={item.href}
       className={cn(
-        "flex flex-col items-center gap-0.5 rounded-full py-1.5 text-[10px] font-semibold transition",
+        "flex flex-col items-center gap-0.5 rounded-full py-1.5 text-[10px] font-semibold transition duration-200 active:scale-90",
         active ? "bg-white/[0.1] text-ink" : "text-muted",
       )}
     >
-      <item.icon className={cn("h-[22px] w-[22px]", active && "text-lime")} />
+      <item.icon className={cn("h-[22px] w-[22px] transition-transform duration-300", active && "text-lime -translate-y-px scale-110")} />
       {item.label}
     </Link>
   );

@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { toggleHabit } from "@/app/actions/tracking";
 import { useToast } from "@/components/ui/toast";
 import { ProgressRing } from "@/components/ui/progress";
+import { haptic } from "@/lib/haptics";
 
 export type HabitRow = { id: string; name: string; icon: string; visible_to_groups: boolean; done: boolean };
 
@@ -42,11 +43,14 @@ export function HabitChecklist({ habits, day, shareHabits }: { habits: HabitRow[
                 aria-pressed={h.done}
                 onClick={() => {
                   const next = !h.done;
+                  haptic(next && done + 1 === total ? "success" : "tap");
                   start(async () => {
                     setOptimistic({ id: h.id, done: next });
                     const res = await toggleHabit(h.id, day, next);
-                    if (!res.ok) toast(res.error, "error");
-                    else if (next && done + 1 === total) toast(CHEERS[Math.floor(Math.random() * CHEERS.length)]!);
+                    if (!res.ok) {
+                      haptic("error");
+                      toast(res.error, "error");
+                    } else if (next && done + 1 === total) toast(CHEERS[Math.floor(Math.random() * CHEERS.length)]!);
                   });
                 }}
                 className={cn(

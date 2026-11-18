@@ -7,7 +7,7 @@ import { Page, PageHeader } from "@/components/page-header";
 import { Card, CardHeader } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { CaloriesChart, HabitTrendChart, MeasurementChart, WeeklyWorkoutsChart, WeightChart } from "@/components/charts/health-charts";
+import { CaloriesChart, HabitTrendChart, MeasurementChart, WeeklyWorkoutsChart, WeightChart } from "@/components/charts/lazy";
 import { CalorieTargetForm, MealForm, MealList } from "@/components/health/food-forms";
 import { HealthProfileForm, MeasurementForm, MeasurementTable, NotesPanel, WeightForm, WeightList } from "@/components/health/health-forms";
 import { ACTIVITIES } from "@/lib/constants";

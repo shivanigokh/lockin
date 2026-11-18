@@ -1,12 +1,12 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useNavPathname } from "@/lib/nav-pending";
 import { squadNav, isActive } from "@/components/shell/nav-config";
 import { cn } from "@/lib/utils";
 
 /** Horizontal squad navigation for small screens (desktop uses the sidebar). */
 export function SquadTabs({ groupId }: { groupId: string }) {
-  const pathname = usePathname();
+  const pathname = useNavPathname();
   return (
     <nav data-scroll-x className="scrollbar-none flex gap-1.5 overflow-x-auto px-4 pt-3 md:hidden">
       {squadNav(groupId)
@@ -19,7 +19,7 @@ export function SquadTabs({ groupId }: { groupId: string }) {
             key={i.href}
             href={i.href}
             className={cn(
-              "whitespace-nowrap rounded-full border px-3.5 py-1.5 text-[13px] font-semibold transition",
+              "whitespace-nowrap rounded-full border px-3.5 py-1.5 text-[13px] font-semibold transition duration-200 active:scale-95",
               active ? "border-white/15 bg-white/[0.14] text-ink" : "border-white/[0.06] bg-white/[0.04] text-muted",
             )}
           >
